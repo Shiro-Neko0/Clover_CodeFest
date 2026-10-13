@@ -3,11 +3,13 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './auth.jsx';
 import App from './App.jsx';
+import AnimatedBackground from './components/AnimatedBackground.jsx';
 import './styles.css';
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <AuthProvider>
+      <AnimatedBackground />
       <App />
     </AuthProvider>
   </BrowserRouter>

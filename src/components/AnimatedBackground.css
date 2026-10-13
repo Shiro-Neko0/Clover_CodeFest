@@ -1,0 +1,119 @@
+/* ---------- Animated background ----------
+   Colours are named values (like in styles.css) so light and dark mode both look right.
+   The dark values are the original dark teal design. Edit the colours here. */
+:root {
+  --fx-base: #e3eeec;
+  --fx-s1: linear-gradient(40deg, rgba(31, 122, 114, 0.22), rgba(79, 209, 197, 0.2));
+  --fx-s2: linear-gradient(240deg, rgba(13, 71, 161, 0.12), rgba(44, 122, 123, 0.18));
+  --fx-s3: linear-gradient(120deg, rgba(79, 209, 197, 0.25), rgba(15, 118, 110, 0.14));
+  --fx-glow: rgba(79, 209, 197, 0.3);
+  --fx-grid: rgba(10, 108, 106, 0.06);
+  --fx-dot: #0a6c6a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fx-base: #030807;
+    --fx-s1: linear-gradient(40deg, rgba(31, 122, 114, 0.6), rgba(79, 209, 197, 0.3));
+    --fx-s2: linear-gradient(240deg, rgba(13, 71, 161, 0.5), rgba(44, 122, 123, 0.3));
+    --fx-s3: linear-gradient(120deg, rgba(79, 209, 197, 0.25), rgba(15, 118, 110, 0.2));
+    --fx-glow: rgba(79, 209, 197, 0.12);
+    --fx-grid: rgba(79, 209, 197, 0.025);
+    --fx-dot: #4fd1c5;
+  }
+}
+:root[data-theme="dark"] {
+  --fx-base: #030807;
+  --fx-s1: linear-gradient(40deg, rgba(31, 122, 114, 0.6), rgba(79, 209, 197, 0.3));
+  --fx-s2: linear-gradient(240deg, rgba(13, 71, 161, 0.5), rgba(44, 122, 123, 0.3));
+  --fx-s3: linear-gradient(120deg, rgba(79, 209, 197, 0.25), rgba(15, 118, 110, 0.2));
+  --fx-glow: rgba(79, 209, 197, 0.12);
+  --fx-grid: rgba(79, 209, 197, 0.025);
+  --fx-dot: #4fd1c5;
+}
+
+/* The background fills the screen and stays behind the app. */
+body { background: var(--fx-base); }
+#root { position: relative; z-index: 1; }
+/* Let the background show through the app frame. Cards, the top bar and the tab bar keep their own solid colour. */
+#root .phone { background: transparent; }
+
+.bgfx {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--fx-base);
+}
+
+.bgfx-sphere {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+}
+.bgfx-s1 { width: 45vw; height: 45vw; background: var(--fx-s1); top: -15%; left: -10%; animation: bgfx-float-1 15s ease-in-out infinite alternate; }
+.bgfx-s2 { width: 50vw; height: 50vw; background: var(--fx-s2); bottom: -20%; right: -10%; animation: bgfx-float-2 18s ease-in-out infinite alternate; }
+.bgfx-s3 { width: 35vw; height: 35vw; background: var(--fx-s3); top: 50%; left: 25%; animation: bgfx-float-3 20s ease-in-out infinite alternate; }
+
+/* On phones the spheres are bigger so the colour still reaches the whole screen. */
+@media (max-width: 600px) {
+  .bgfx-s1 { width: 90vw; height: 90vw; }
+  .bgfx-s2 { width: 100vw; height: 100vw; }
+  .bgfx-s3 { width: 70vw; height: 70vw; }
+}
+
+.bgfx-glow {
+  position: absolute;
+  width: 40vw;
+  height: 40vh;
+  top: 50%;
+  left: 50%;
+  background: radial-gradient(circle, var(--fx-glow), transparent 70%);
+  filter: blur(40px);
+  transform: translate(-50%, -50%);
+  animation: bgfx-pulse 8s infinite alternate;
+}
+
+.bgfx-grid {
+  position: absolute;
+  inset: 0;
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, var(--fx-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--fx-grid) 1px, transparent 1px);
+}
+
+.bgfx-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.bgfx-dots { position: absolute; inset: 0; }
+.bgfx-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--fx-dot);
+  opacity: 0;
+  animation: bgfx-rise linear infinite;
+}
+
+@keyframes bgfx-float-1 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(8%, 12%) scale(1.1); } }
+@keyframes bgfx-float-2 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-10%, -8%) scale(1.15); } }
+@keyframes bgfx-float-3 { 0% { transform: translate(0, 0) scale(1); opacity: 0.2; } 100% { transform: translate(-8%, 8%) scale(1.08); opacity: 0.5; } }
+@keyframes bgfx-pulse {
+  0% { opacity: 0.2; transform: translate(-50%, -50%) scale(0.9); }
+  100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.1); }
+}
+@keyframes bgfx-rise {
+  0% { opacity: 0; transform: translate(0, 0); }
+  15% { opacity: var(--o); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)); }
+}
+
+/* People who turn on "reduce motion" in their phone settings get a still background. */
+@media (prefers-reduced-motion: reduce) {
+  .bgfx-sphere, .bgfx-glow { animation: none; }
+  .bgfx-dots { display: none; }
+}
