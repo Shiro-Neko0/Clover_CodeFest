@@ -1,4 +1,4 @@
-<title>Care Aide</title>
+<title>Rakan Sihat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:wght@600;700;800&display=swap">
@@ -191,7 +191,7 @@ video{width:100%;border-radius:14px;max-height:220px;background:#000}
 
 <div class="stage">
   <aside class="side">
-    <h1>Care Aide</h1>
+    <h1>Rakan Sihat</h1>
     <p>A clickable prototype of the health buddy app for older adults and their caregivers. Everything here is example data.</p>
     <h2>View as</h2>
     <div class="seg" id="roleSeg"></div>
@@ -206,7 +206,7 @@ video{width:100%;border-radius:14px;max-height:220px;background:#000}
     <h2>Added beyond your list</h2>
     <ul>
       <li>SOS button with caregiver alert</li>
-      <li>Ask Care Aide chat on every screen</li>
+      <li>Ask Rakan Sihat chat on every screen</li>
       <li>Share a video with family</li>
       <li>Screenings due, with quick booking</li>
       <li>Text size setting</li>
@@ -216,7 +216,7 @@ video{width:100%;border-radius:14px;max-height:220px;background:#000}
     <p style="font-size:13px">Voice, meal calories and chat replies are simulated.</p>
     <button class="btn ghost sm" data-act="reset">Reset demo</button>
   </aside>
-  <main class="phone" id="phone" aria-label="Care Aide prototype">
+  <main class="phone" id="phone" aria-label="Rakan Sihat prototype">
     <div id="bar"></div>
     <div class="screen" id="screen"></div>
     <nav class="nav" id="nav" aria-label="Main"></nav>
@@ -315,9 +315,9 @@ function tiles(){
 /* ---------- login ---------- */
 function loginView(){return `<div class="login">
  <div class="logo">${ic('heart',40)}</div>
- <div><h2 class="t" style="font-size:2em">Care Aide</h2><p class="sub" style="font-size:1.05em;margin-top:6px">Your health buddy, every day.</p></div>
+ <div><h2 class="t" style="font-size:2em">Rakan Sihat</h2><p class="sub" style="font-size:1.05em;margin-top:6px">Your health buddy, every day.</p></div>
  <p class="lbl" style="margin:8px 0 0">Sign in as</p>
- <button class="who" data-act="setrole" data-v="elder"><span class="av">${ic('user',30)}</span><span><b>Pak Hassan</b><span class="sub">I use Care Aide for myself</span></span></button>
+ <button class="who" data-act="setrole" data-v="elder"><span class="av">${ic('user',30)}</span><span><b>Pak Hassan</b><span class="sub">I use Rakan Sihat for myself</span></span></button>
  <button class="who" data-act="setrole" data-v="care"><span class="av">${ic('home',30)}</span><span><b>Aisyah</b><span class="sub">I look after someone</span></span></button>
  <p class="note">Prototype with example people and data.</p></div>`}
 
@@ -451,7 +451,7 @@ function careView(){
 /* ---------- bars, nav, sheets ---------- */
 function barHTML(){
  const care=S.role==='care';
- return `<header class="bar"><div class="brand">${ic('heart',24)}<span>Care Aide</span>${care?'<span class="rolechip">Caregiver</span>':''}</div>
+ return `<header class="bar"><div class="brand">${ic('heart',24)}<span>Rakan Sihat</span>${care?'<span class="rolechip">Caregiver</span>':''}</div>
  ${care?'':`<div class="barbtns"><button class="pillbtn ask" data-act="sheet" data-v="ask">${ic('chat',20)} Ask</button><button class="pillbtn sos" data-act="sheet" data-v="sos">${ic('sos',20)} SOS</button></div>`}</header>`;
 }
 function navHTML(){
@@ -474,7 +474,7 @@ function sheetHTML(){
   <p style="margin:0">If you are in danger or very unwell, call the emergency number.</p>
   <div class="card" style="background:var(--bad-soft);border-color:transparent;align-items:center"><span class="note" style="color:var(--bad)">Emergency</span><div style="font:800 3em var(--font-d);color:var(--bad)">999</div></div>
   <button class="btn bad full" data-act="alertcg">${ic('bell',22)} Alert Aisyah</button><button class="btn ghost full" data-act="closesheet">Close</button>`}
- if(S.sheet==='ask'){const a=S.ask;body=`<div class="row sp"><h2 class="t">Ask Care Aide</h2><span class="pill mute">AI</span></div>
+ if(S.sheet==='ask'){const a=S.ask;body=`<div class="row sp"><h2 class="t">Ask Rakan Sihat</h2><span class="pill mute">AI</span></div>
   <div class="thread" id="thread" style="max-height:300px">${a.msgs.map(m=>`<div class="msg ${m.f}">${esc(m.t)}</div>`).join('')}${a.busy?'<div class="typing">Aide is typing…</div>':''}</div>
   <div class="chips">${['I feel dizzy','What can I eat for dinner?','Pills with tea?','What is HbA1c?'].map(q=>`<button class="chip" data-act="askq" data-v="${q}">${q}</button>`).join('')}</div>
   <form class="composer" data-form="ask"><input type="text" id="ai" placeholder="Type your question" aria-label="Your question" autocomplete="off"><button class="round go" aria-label="Send">${ic('send',22)}</button></form>
