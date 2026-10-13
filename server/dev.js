@@ -2,4 +2,4 @@
 import app from './app.js';
 
 const port = process.env.PORT || 4000;
-app.listen(port, () => console.log(`Care Aide API on http://localhost:${port}`));
+app.listen(port, () => console.log(`Cakna API on http://localhost:${port}`));

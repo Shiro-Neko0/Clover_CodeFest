@@ -59,7 +59,7 @@ export function AskSheet({ onClose, name }) {
 
   return (
     <Sheet onClose={onClose}>
-      <div className="row sp"><h2 className="t">Ask Care Aide</h2><span className="pill mute">AI</span></div>
+      <div className="row sp"><h2 className="t">Ask Cakna</h2><span className="pill mute">AI</span></div>
       <div className="thread" style={{ maxHeight: 300 }}>
         {msgs.map((m, i) => <div key={i} className={`msg ${m.from === 'user' ? 'u' : 'b'}`}>{m.text}</div>)}
         {busy && <div className="typing">Aide is typing…</div>}

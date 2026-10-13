@@ -1,6 +1,6 @@
 
 /* Layout: a phone-sized prototype in the middle, a small control panel beside it on wide screens.
-   Type: Bricolage Grotesque for headings, Atkinson Hyperlegible (made for low-vision readers) for everything else. */
+   Type: Poppins for headings, Poppins (made for low-vision readers) for everything else. */
 :root{
   --page:#dce6e4; --bg:#eef3f2; --surface:#ffffff; --ink:#10282a; --muted:#4a6264; --line:#d0dcda;
   --accent:#0a6c6a; --accent-ink:#ffffff; --accent-soft:#d6ede9;
@@ -9,7 +9,7 @@
   --bad:#b3261e; --bad-soft:#fbe1de; --bad-solid:#c4271d;
   --bar:#a5cfca;
   --g1a:#0c5b59; --g1b:#142f38; --g2a:#b4540a; --g2b:#43200c; --g3a:#a3263d; --g3b:#3a1020; --g4a:#3d52b8; --g4b:#15183c;
-  --font-d:'Bricolage Grotesque',system-ui,sans-serif; --font-b:'Atkinson Hyperlegible',system-ui,sans-serif;
+  --font-d:'Poppins',system-ui,sans-serif; --font-b:'Poppins',system-ui,sans-serif;
   --scale:1;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -80,6 +80,7 @@ h3.s{font:700 1.05em var(--font-d);margin:0}
 .who:hover{border-color:var(--accent)}
 .who .av{width:56px;height:56px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
 .who b{display:block;font:700 1.1em var(--font-d)}
+
 
 /* videos */
 .feedtop{padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--line);flex:none}

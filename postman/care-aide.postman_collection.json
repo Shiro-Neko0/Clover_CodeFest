@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "Care Aide API",
+    "name": "Cakna API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "description": "Run \"Register elder\" or \"Login\" first. It saves the token for the other requests. Switch to the caregiver by running \"Login caregiver\"."
   },

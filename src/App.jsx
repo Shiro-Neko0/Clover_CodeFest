@@ -26,7 +26,7 @@ function Shell() {
   return (
     <div className="phone" style={{ '--scale': scale }}>
       <header className="bar">
-        <div className="brand"><Icon name="heart" size={24} /><span>Care Aide</span>{!elder && <span className="rolechip">Caregiver</span>}</div>
+        <div className="brand"><Icon name="heart" size={24} /><span>Cakna</span>{!elder && <span className="rolechip">Caregiver</span>}</div>
         {elder && (
           <div className="barbtns">
             <button className="pillbtn ask" onClick={() => setSheet('ask')}><Icon name="chat" size={20} /> Ask</button>

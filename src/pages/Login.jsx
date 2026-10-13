@@ -22,7 +22,7 @@ export default function Login() {
       <main className="screen" style={{ justifyContent: 'center' }}>
         <div className="logo" style={{ alignSelf: 'center' }}><Icon name="heart" size={40} /></div>
         <div style={{ textAlign: 'center' }}>
-          <h1 className="t" style={{ fontSize: '2em' }}>Care Aide</h1>
+          <h1 className="t" style={{ fontSize: '2em' }}>Cakna</h1>
           <p className="sub" style={{ fontSize: '1.05em' }}>Your health buddy, every day.</p>
         </div>
         <form className="card" onSubmit={submit}>
