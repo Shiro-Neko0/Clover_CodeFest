@@ -1,4 +1,4 @@
-# Care Aide
+# Rakan Sihat
 
 A health buddy app for older people, with a separate caregiver account.
 Stack: **React (Vite)**, **Node.js + Express**, **MongoDB Atlas**, **Gemini API**, deployed on **Vercel**, tested with **Postman**.
