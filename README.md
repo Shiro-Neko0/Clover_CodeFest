@@ -1,7 +1,7 @@
 # Rakan Sihat
 
 A health buddy app for older people, with a separate caregiver account.
-Stack: **React (Vite)**, **Node.js + Express**, **MongoDB Atlas**, **Gemini API**, deployed on **Vercel**, tested with **Postman**.
+Stack: **React (Vite)**, **Node.js + Express**, **MongoDB Atlas**, **Claude API**, deployed on **Vercel**, tested with **Postman**.
 
 ## What works now
 
@@ -24,7 +24,7 @@ You need Node.js 20.6 or newer.
 
 1. **Install:** `npm install`
 2. **MongoDB Atlas:** make a free cluster, create a database user, and under Network Access allow `0.0.0.0/0` (needed for Vercel). Copy the connection string.
-3. **Gemini key:** create a free key at https://aistudio.google.com and copy it.
+3. **Claude key:** create a free key at platform.claude.com and copy it.
 4. **Cloudinary (for videos):** make a free account. Settings > Upload > add an **unsigned** upload preset. Note the cloud name and preset name.
 5. **Environment:** copy `.env.example` to `.env` and fill in every value. Pick any long random string for `JWT_SECRET`.
 6. **Run:** `npm run dev`. Open http://localhost:5173. The API runs on port 4000.
@@ -56,7 +56,7 @@ api/index.js            Vercel entry point (do not edit)
 server/
   app.js                Express setup, route list
   models.js             MongoDB collections
-  ai.js                 All Gemini prompts and calls (AI person edits here)
+  ai.js                 All Claude prompts and calls (AI person edits here)
   auth.js               Login token check, roles, caregiver access
   routes/               One file per feature
 src/
@@ -71,7 +71,7 @@ postman/                API test collection
 ## Known limits and things to decide
 
 - **Medical safety:** Aide gives general information only. Emergency words are caught by a keyword list in `server/ai.js` before the AI answers. Have a health professional review the wording and the example thresholds in `src/components/Tiles.jsx` before you present them as real.
-- **Gemini free tier** has low rate limits. If many people test at once during the demo, expect "AI helper is busy" messages. Check the model name in AI Studio if calls start failing.
+- **Claude free tier** has low rate limits. If many people test at once during the demo, expect "AI helper is busy" messages. Check the model name in AI Studio if calls start failing.
 - **Videos** are uploaded straight to Cloudinary. Do not send them through the API (Vercel limits bodies to about 4.5 MB).
 - **Reminders:** a web app cannot reliably alarm in the background, especially on iPhone. Decide whether to show an in-app "due now" banner (easy), use web push (medium), or send messages another way.
 - **Privacy:** this stores health data and videos. Add a consent line and mention how data is protected in your pitch.

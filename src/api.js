@@ -20,9 +20,7 @@ export async function api(path, { method = 'GET', body } = {}) {
     throw new Error(data.error || 'Something went wrong. Please try again.');
   }
   return data;
-}
-
-// Videos go straight from the phone to Cloudinary (unsigned upload), so they never pass through Vercel's 4.5 MB limit.
+}// Videos go straight from the phone to Cloudinary (unsigned upload), so they never pass through Vercel's 4.5 MB limit.
 // Setup: see README, "Cloudinary".
 export async function uploadMedia(file, kind = 'video') {
   const cloud = import.meta.env.VITE_CLOUDINARY_CLOUD;
