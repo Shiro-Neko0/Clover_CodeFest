@@ -8,6 +8,7 @@ import meds from './routes/meds.js';
 import appointments from './routes/appointments.js';
 import overview from './routes/overview.js';
 import chat from './routes/chat.js';
+import profile from './routes/profile.js';
 
 const app = express();
 app.use(cors());
