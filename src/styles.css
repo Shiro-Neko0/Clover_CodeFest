@@ -2,7 +2,7 @@
 /* Layout: a phone-sized prototype in the middle, a small control panel beside it on wide screens.
    Type: Poppins for headings, Poppins (made for low-vision readers) for everything else. */
 :root{
-  --page:#dce6e4; --bg:#eef3f2; --surface:#ffffff; --ink:#10282a; --muted:#4a6264; --line:#d0dcda;
+  --page:#dce6e4; --bg:#EEF3F2; --surface:#ffffff; --ink:#10282a; --muted:#4a6264; --line:#d0dcda;
   --accent:#0a6c6a; --accent-ink:#ffffff; --accent-soft:#d6ede9;
   --warm:#8f4700; --warm-soft:#fcebd0;
   --ok:#1c7640; --ok-soft:#dcf1e3;
@@ -34,12 +34,12 @@ button{cursor:pointer;border:0;background:none}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 
 .phone{position:relative;width:100%;max-width:400px;height:min(100%,860px);background:var(--bg);border:1px solid var(--line);border-radius:28px;overflow:hidden;display:flex;flex-direction:column;font-size:calc(17px * var(--scale));line-height:1.4}
-.bar{flex-wrap:wrap;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--line);flex:none}
+.bar{flex-wrap:wrap;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 14px;background:var(--surface);border-bottom:1px solid var(--line);flex:none}
 .brand{display:flex;align-items:center;gap:8px;font:800 1.2em var(--font-d);letter-spacing:-.01em;min-width:0}
-.brand svg{flex:none;color:var(--accent)}
+.brand svg{height: 44 px; width: auto; display: block; flex:none;color:var(--accent)}
 .rolechip{font:700 .6em var(--font-b);padding:3px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
 .barbtns{display:flex;gap:8px}
-.pillbtn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:999px;font-weight:700;font-size:.9em}
+.pillbtn{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:100px;font-weight:700;font-size:.9em}
 .pillbtn.ask{background:var(--accent-soft);color:var(--accent)}
 .pillbtn.sos{background:var(--bad-solid);color:#fff}
 
@@ -52,7 +52,7 @@ button{cursor:pointer;border:0;background:none}
 
 h2.t{font:800 1.45em/1.15 var(--font-d);margin:0;letter-spacing:-.015em;text-wrap:balance}
 h3.s{font:700 1.05em var(--font-d);margin:0}
-.sub{color:var(--muted);font-size:.9em;margin:0}
+.sub{color:;font-size:.9em;margin:0}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
 .row{display:flex;align-items:center;gap:12px}
 .row.sp{justify-content:space-between}
@@ -189,3 +189,8 @@ body{padding:0}
 .center{min-height:100%;display:grid;place-items:center;color:var(--muted)}
 input[type=text],input[type=email],input[type=password],input[type=date],input[type=time]{min-height:52px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);padding:0 14px;width:100%}
 .linkcode{font:800 2em var(--font-d);letter-spacing:.2em;text-align:center;color:var(--accent)}
+.bar { padding: 6px 14px; }
+.brand img { height: 44px; width: auto; display: block; }
+/* Login screen spacing */
+.card .btn.full { margin-top: 14px; }      /* gap between Password and Sign in */
+.screen > .btn.ghost { margin-top: 10px; } /* gap between Sign in and "Create a new account" */

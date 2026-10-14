@@ -26,7 +26,7 @@ function Shell() {
   return (
     <div className="phone" style={{ '--scale': scale }}>
       <header className="bar">
-        <div className="brand"><img src="/logo-cakna.svg" alt ="" width="28" height="28" /><span>Cakna</span>{!elder && <span className="rolechip">Caregiver</span>}</div>
+        <div className="brand"><img src="/logo-cakna.svg" alt ="" width="50" height="80" />{!elder && <span className="rolechip">Caregiver</span>}</div>
         {elder && (
           <div className="barbtns">
             <button className="pillbtn ask" onClick={() => setSheet('ask')}><Icon name="chat" size={20} /> Ask</button>
@@ -37,7 +37,7 @@ function Shell() {
       <Outlet />
       <nav className={`nav${elder ? '' : ' n3'}`} aria-label="Main">
         {tabs.map(([to, label, icon]) => (
-          <NavLink key={to} to={to}><Icon name={icon} size={26} />{label}</NavLink>
+          <NavLink key={to} to={to}><Icon name={icon} size={24} />{label}</NavLink>
         ))}
       </nav>
       {sheet === 'sos' && <SosSheet onClose={() => setSheet(null)} />}
