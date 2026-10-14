@@ -27,6 +27,7 @@ app.use('/api/meals', meals);
 app.use('/api/meds', meds);
 app.use('/api/appointments', appointments);
 app.use('/api/chat', chat);
+app.use('/api/profile', profile);
 app.use('/api', overview); // /api/alerts and /api/overview
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found.' }));
@@ -34,7 +35,7 @@ app.use('/api', (req, res) => res.status(404).json({ error: 'Not found.' }));
 // Express 5 sends errors from async handlers here. Keep the message friendly and log the details.
 app.use((err, req, res, next) => {
   console.error(err);
-  const aiProblem = /CLAUDE|429|quota|RESOURCE_EXHAUSTED|fetch failed/i.test(String(err?.message));
+  const aiProblem = /CLAUDE|GEMINI|503|UNAVAILABLE|429|quota|RESOURCE_EXHAUSTED|fetch failed/i.test(String(err?.message));
   res.status(500).json({
     error: aiProblem ? 'The AI helper is busy right now. Please try again in a minute.' : 'Something went wrong on our side. Please try again.'
   });
