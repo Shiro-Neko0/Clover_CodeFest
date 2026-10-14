@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 // Vercel can reuse a function instance between requests. Keeping the connection on globalThis
 // stops every request from opening a new connection, which would exhaust the free Atlas tier.
-const cache = globalThis._careAideMongo || (globalThis._careAideMongo = { conn: null, promise: null });
+const cache = globalThis._carecloverMongo || (globalThis._carecloverMongo = { conn: null, promise: null });
 
 export async function connectDB() {
   if (cache.conn) return cache.conn;

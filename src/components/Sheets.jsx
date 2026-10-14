@@ -36,7 +36,7 @@ export function SosSheet({ onClose }) {
 
 const SUGGESTIONS = ['I feel dizzy', 'What can I eat for dinner?', 'Can I take pills with tea?', 'What is HbA1c?'];
 
-// Ask Aide: the AI chatbot, answered by /api/chat.
+// Ask clover: the AI chatbot, answered by /api/chat.
 export function AskSheet({ onClose, name }) {
   const [msgs, setMsgs] = useState([{ from: 'bot', text: `Hello ${name}. Ask me about your medicine, food or how you feel. I give general information, not a diagnosis.` }]);
   const [text, setText] = useState('');
@@ -62,7 +62,7 @@ export function AskSheet({ onClose, name }) {
       <div className="row sp"><h2 className="t">Ask Cakna</h2><span className="pill mute">AI</span></div>
       <div className="thread" style={{ maxHeight: 300 }}>
         {msgs.map((m, i) => <div key={i} className={`msg ${m.from === 'user' ? 'u' : 'b'}`}>{m.text}</div>)}
-        {busy && <div className="typing">Aide is typing…</div>}
+        {busy && <div className="typing">clover is typing…</div>}
         <div ref={end} />
       </div>
       <div className="chips">{SUGGESTIONS.map((q) => <button key={q} className="chip" onClick={() => send(q)}>{q}</button>)}</div>

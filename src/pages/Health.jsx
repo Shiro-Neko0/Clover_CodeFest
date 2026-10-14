@@ -8,7 +8,7 @@ const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 export default function Health() {
   const { user } = useAuth();
-  const [msgs, setMsgs] = useState([{ from: 'bot', text: `Hello ${user.name}, I'm Aide. How did you sleep last night?` }]);
+  const [msgs, setMsgs] = useState([{ from: 'bot', text: `Hello ${user.name}, I'm clover. How did you sleep last night?` }]);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [listening, setListening] = useState(false);
@@ -71,10 +71,10 @@ export default function Health() {
       {err && <div className="err">{err}</div>}
 
       <section className="card" aria-label="Daily check-in">
-        <div className="row sp"><h3 className="s">Today's check-in</h3><span className="pill mute">Aide · AI</span></div>
+        <div className="row sp"><h3 className="s">Today's check-in</h3><span className="pill mute">clover · AI</span></div>
         <div className="thread">
           {msgs.map((m, i) => <div key={i} className={`msg ${m.from === 'user' ? 'u' : 'b'}`}>{m.text}</div>)}
-          {busy && <div className="typing">Aide is typing…</div>}
+          {busy && <div className="typing">clover is typing…</div>}
           {listening && <div className="typing">Listening…</div>}
           <div ref={end} />
         </div>
@@ -89,7 +89,7 @@ export default function Health() {
 
       <section className="card" aria-label="Meals">
         <h3 className="s">Meals today</h3>
-        {meals.meals.length === 0 && <p className="sub">No meals yet. Tell Aide in the chat, or add a photo.</p>}
+        {meals.meals.length === 0 && <p className="sub">No meals yet. Tell clover in the chat, or add a photo.</p>}
         {meals.meals.map((m) => (
           <div className="meal" key={m._id}>
             <div className="thumb"><Icon name="food" size={26} /></div>

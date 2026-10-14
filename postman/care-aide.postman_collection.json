@@ -580,7 +580,7 @@
       "name": "AI chat and alerts",
       "item": [
         {
-          "name": "Ask Aide",
+          "name": "Ask clover",
           "request": {
             "method": "POST",
             "header": [
@@ -606,7 +606,7 @@
           }
         },
         {
-          "name": "Ask Aide (emergency words skip the AI)",
+          "name": "Ask clover (emergency words skip the AI)",
           "request": {
             "method": "POST",
             "header": [

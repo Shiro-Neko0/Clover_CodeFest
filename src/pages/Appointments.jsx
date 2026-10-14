@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api.js';
 import Icon from '../components/Icon.jsx';
 
-// TODO (team): swap this list for the month-grid calendar from the prototype (see "apptsView" in care-aide.html).
+// TODO (team): swap this list for the month-grid calendar from the prototype (see "apptsView" in care-clover.html).
 const fmt = (d) => new Date(d + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kuala_Lumpur' });
 

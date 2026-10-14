@@ -279,7 +279,7 @@ const fresh=()=>({
  meals:[{name:'Oat porridge and kopi O',kcal:520,time:'7:40 am',img:null}],
  analyzing:false,lastMeal:null,mi:0,
  wkSleep:[7,6,5.5,7.5,6,6.5],wkKcal:[1720,1650,1890,1580,1760,1700],
- chk:{step:0,busy:false,listening:false,msgs:[{f:'b',t:'Hello Pak Hassan, I\'m Aide. How did you sleep last night?'}]},
+ chk:{step:0,busy:false,listening:false,msgs:[{f:'b',t:'Hello Pak Hassan, I\'m clover. How did you sleep last night?'}]},
  ask:{busy:false,msgs:[{f:'b',t:'Hello Pak Hassan. Ask me about your medicine, food or how you feel. I give general information, not a diagnosis.'}]},
  meds:[
   {id:1,name:'Metformin',dose:'500 mg, 1 tablet after breakfast',time:'8:00 am',st:'taken'},
@@ -364,8 +364,8 @@ function apptsView(){
 const QUICK=[['About 7 hours','Not so good'],['Nasi lemak and teh tarik','Not yet'],['None','A little dizzy'],['130/85','Skip'],[]];
 function chatCard(){
  const c=S.chk;
- return `<div class="card"><div class="row sp"><h3 class="s">Today's check-in</h3><span class="pill mute">Aide · AI</span></div>
- <div class="thread" id="thread">${c.msgs.map(m=>`<div class="msg ${m.f}">${esc(m.t)}${m.voice?'<small>Sent by voice</small>':''}</div>`).join('')}${c.busy?'<div class="typing">Aide is typing…</div>':''}${c.listening?'<div class="typing">Listening…</div>':''}</div>
+ return `<div class="card"><div class="row sp"><h3 class="s">Today's check-in</h3><span class="pill mute">clover · AI</span></div>
+ <div class="thread" id="thread">${c.msgs.map(m=>`<div class="msg ${m.f}">${esc(m.t)}${m.voice?'<small>Sent by voice</small>':''}</div>`).join('')}${c.busy?'<div class="typing">clover is typing…</div>':''}${c.listening?'<div class="typing">Listening…</div>':''}</div>
  ${QUICK[c.step].length?`<div class="chips">${QUICK[c.step].map(q=>`<button class="chip" data-act="quick" data-v="${esc(q)}">${esc(q)}</button>`).join('')}</div>`:''}
  <form class="composer" data-form="chk"><input type="text" id="ci" placeholder="Type, or tap the mic" aria-label="Your answer" autocomplete="off"><button type="button" class="round${c.listening?' live':''}" data-act="mic" aria-label="Speak your answer">${ic('mic')}</button><button class="round go" aria-label="Send">${ic('send',22)}</button></form>
  <div class="row sp"><span class="note">Voice is simulated in this prototype.</span><button class="note" style="text-decoration:underline" data-act="restart">Restart</button></div></div>`;
@@ -475,7 +475,7 @@ function sheetHTML(){
   <div class="card" style="background:var(--bad-soft);border-color:transparent;align-items:center"><span class="note" style="color:var(--bad)">Emergency</span><div style="font:800 3em var(--font-d);color:var(--bad)">999</div></div>
   <button class="btn bad full" data-act="alertcg">${ic('bell',22)} Alert Aisyah</button><button class="btn ghost full" data-act="closesheet">Close</button>`}
  if(S.sheet==='ask'){const a=S.ask;body=`<div class="row sp"><h2 class="t">Ask Rakan Sihat</h2><span class="pill mute">AI</span></div>
-  <div class="thread" id="thread" style="max-height:300px">${a.msgs.map(m=>`<div class="msg ${m.f}">${esc(m.t)}</div>`).join('')}${a.busy?'<div class="typing">Aide is typing…</div>':''}</div>
+  <div class="thread" id="thread" style="max-height:300px">${a.msgs.map(m=>`<div class="msg ${m.f}">${esc(m.t)}</div>`).join('')}${a.busy?'<div class="typing">clover is typing…</div>':''}</div>
   <div class="chips">${['I feel dizzy','What can I eat for dinner?','Pills with tea?','What is HbA1c?'].map(q=>`<button class="chip" data-act="askq" data-v="${q}">${q}</button>`).join('')}</div>
   <form class="composer" data-form="ask"><input type="text" id="ai" placeholder="Type your question" aria-label="Your question" autocomplete="off"><button class="round go" aria-label="Send">${ic('send',22)}</button></form>
   <button class="btn ghost full" data-act="closesheet">Close</button>`}
@@ -587,7 +587,7 @@ const A={
  mic(){const c=S.chk;if(c.busy||c.listening)return;c.listening=true;render();
   const s=['Not so good, maybe 5 hours, I woke up twice','Nasi lemak and teh tarik','A little dizzy when I stood up','135/88','Thank you'][Math.min(c.step,4)];
   setTimeout(()=>{c.listening=false;userSay(s,true)},1200)},
- restart(){S.chk={step:0,busy:false,listening:false,msgs:[{f:'b',t:'Hello Pak Hassan, I\'m Aide. How did you sleep last night?'}]};S.changed={};render()},
+ restart(){S.chk={step:0,busy:false,listening:false,msgs:[{f:'b',t:'Hello Pak Hassan, I\'m clover. How did you sleep last night?'}]};S.changed={};render()},
  samplemeal(){addMeal(null)},
  medsample(v){markTaken(v,null)},
  snooze(){toast('I will remind you in 10 minutes')},
