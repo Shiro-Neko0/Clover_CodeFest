@@ -1,8 +1,47 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 
 const SIZES = [['Normal', 1], ['Large', 1.15], ['Extra large', 1.3]];
+
+  function HealthProfile() {
+    const [age, setAge] = useState('');
+    const [conditions, setConditions] = useState('');
+    const [medicines, setMedicines] = useState('');
+    const [msg, setMsg] = useState('');
+    const [err, setErr] = useState('');
+
+    useEffect(() => {
+      api('/profile')
+        .then((p) => { setAge(p.age ?? ''); setConditions(p.conditions.join(', ')); setMedicines(p.medicines.join(', ')); })
+        .catch((e) => setErr(e.message));
+    }, []);
+
+    async function save(e) {
+      e.preventDefault(); setMsg(''); setErr('');
+      try {
+        await api('/profile', { method: 'PUT', body: { age, conditions, medicines } });
+        setMsg('Saved. Aide will use this to fit its advice to you.');
+      } catch (e2) { setErr(e2.message); }
+    }
+
+    const box = { width: '100%', margin: '6px 0 12px' };
+    return (
+      <form className="card" onSubmit={save}>
+        <h3 className="s">My health profile</h3>
+        <p className="sub">Aide uses this to give advice that fits you. Separate items with commas.</p>
+        <label htmlFor="p-age">Age</label>
+        <input id="p-age" type="number" value={age} onChange={(e) => setAge(e.target.value)} style={box} />
+        <label htmlFor="p-cond">Health conditions</label>
+        <input id="p-cond" type="text" value={conditions} onChange={(e) => setConditions(e.target.value)} placeholder="Diabetes, High blood pressure" style={box} />
+        <label htmlFor="p-med">Medicines</label>
+        <input id="p-med" type="text" value={medicines} onChange={(e) => setMedicines(e.target.value)} placeholder="Metformin, Amlodipine" style={box} />
+        {err && <div className="err">{err}</div>}
+        {msg && <div className="banner">{msg}</div>}
+        <button className="btn full">Save profile</button>
+      </form>
+    );
+  }
 
 export default function Me() {
   const { user, setUser, logout } = useAuth();
@@ -43,6 +82,8 @@ export default function Me() {
           {err && <div className="err">{err}</div>}
         </div>
       )}
+
+      {elder && <HealthProfile />}
 
       <div className="card">
         <h3 className="s">Text size</h3>
