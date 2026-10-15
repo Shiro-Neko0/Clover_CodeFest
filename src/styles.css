@@ -52,7 +52,7 @@ button{cursor:pointer;border:0;background:none}
 
 h2.t{font:800 1.45em/1.15 var(--font-d);margin:0;letter-spacing:-.015em;text-wrap:balance}
 h3.s{font:700 1.05em var(--font-d);margin:0}
-.sub{color:;font-size:.9em;margin:0}
+.sub{color:var(--muted);font-size:.9em;margin:0}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
 .row{display:flex;align-items:center;gap:12px}
 .row.sp{justify-content:space-between}
@@ -161,6 +161,13 @@ input[type=text],input[type=date]{min-height:52px;border-radius:12px;border:1.5p
 /* meds */
 .dose{display:flex;gap:12px;align-items:center}
 .dose .tm{flex:none;width:76px;font-weight:700;font-size:.9em;font-variant-numeric:tabular-nums}
+.add-med{padding:10px 14px;gap:6px}
+.add-med summary{font-weight:700;cursor:pointer;min-height:36px;display:flex;align-items:center}
+.add-med form{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.add-med .field{gap:3px}
+.add-med .field label{font-size:.84em}
+.add-med input[type=text],.add-med input[type=time]{min-height:42px;padding:0 12px}
+.add-med .btn{min-height:44px}
 .next{background:var(--accent);color:var(--accent-ink);border:0}
 .next .sub,.next .note{color:inherit;opacity:.9}
 .vlog{display:flex;flex-direction:column;gap:10px}

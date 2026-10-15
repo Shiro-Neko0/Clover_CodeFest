@@ -77,9 +77,9 @@ export default function Meds() {
         </div>
       )}
 
-      <details className="card">
-        <summary style={{ fontWeight: 700, cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center' }}>Add a medicine</summary>
-        <form onSubmit={addMed} style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
+      <details className="card add-med">
+        <summary>Add a medicine</summary>
+        <form onSubmit={addMed}>
           <div className="field"><label htmlFor="mname">Name</label><input id="mname" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
           <div className="field"><label htmlFor="mdose">How to take it</label><input id="mdose" type="text" value={form.dose} onChange={(e) => setForm({ ...form, dose: e.target.value })} placeholder="500 mg, 1 tablet after breakfast" /></div>
           <div className="field"><label htmlFor="mtime">Time</label><input id="mtime" type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} required /></div>
