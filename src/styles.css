@@ -52,7 +52,7 @@ button{cursor:pointer;border:0;background:none}
 
 h2.t{font:800 1.45em/1.15 var(--font-d);margin:0;letter-spacing:-.015em;text-wrap:balance}
 h3.s{font:700 1.05em var(--font-d);margin:0}
-.sub{color:;font-size:.9em;margin:0}
+.sub{color:var(--muted);font-size:.9em;margin:0}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
 .row{display:flex;align-items:center;gap:12px}
 .row.sp{justify-content:space-between}
