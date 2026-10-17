@@ -1,3 +1,4 @@
+import { buildContext } from '../context.js';
 import { Router } from 'express';
 import { requireAuth } from '../auth.js';
 import { chatTurn, RED_FLAGS } from '../ai.js';
@@ -14,7 +15,8 @@ r.post('/', async (req, res) => {
   if (RED_FLAGS.test(last.text)) {
     return res.json({ sos: true, reply: 'This may be an emergency. Please call 999 now. If you can, press SOS so your caregiver knows.' });
   }
-  res.json({ reply: await chatTurn(messages) });
+      const context = req.user.role === 'elder' ? await buildContext(req.user) : '';
+    res.json({ reply: await chatTurn(messages, context) });
 });
 
 export default r;

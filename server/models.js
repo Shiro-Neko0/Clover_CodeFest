@@ -10,6 +10,9 @@ const User = new Schema({
   passwordHash: { type: String, required: true },
   role: { type: String, enum: ['elder', 'caregiver'], required: true },
   linkCode: { type: String, index: true, sparse: true },
+  age: Number,
+  conditions: [String],
+  medicines: [String],
   elders: [ref('User')],      // set on caregivers
   caregivers: [ref('User')]   // set on elders
 }, { timestamps: true });
