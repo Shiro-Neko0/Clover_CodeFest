@@ -47,6 +47,7 @@ button{cursor:pointer;border:0;background:none}
 .screen.flush{padding:0;overflow:hidden;gap:0}
 .nav{display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));flex:none}
 .nav.n3{grid-template-columns:repeat(3,1fr)}
+.nav.n4{grid-template-columns:repeat(4,1fr)}
 .nav button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:14px;font-size:.74em;font-weight:700;color:var(--muted);min-height:56px}
 .nav button[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
 
@@ -71,6 +72,7 @@ h3.s{font:700 1.05em var(--font-d);margin:0}
 .chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .note{font-size:.8em;color:var(--muted)}
 .banner{background:var(--warm-soft);color:var(--warm);border-radius:14px;padding:10px 14px;font-size:.88em;font-weight:700}
+.setting-toggle{width:24px;height:24px;flex:none;accent-color:var(--accent)}
 .ic{flex:none}
 
 /* login */
@@ -161,6 +163,13 @@ input[type=text],input[type=date]{min-height:52px;border-radius:12px;border:1.5p
 /* meds */
 .dose{display:flex;gap:12px;align-items:center}
 .dose .tm{flex:none;width:76px;font-weight:700;font-size:.9em;font-variant-numeric:tabular-nums}
+.add-med{padding:10px 14px;gap:6px}
+.add-med summary{font-weight:700;cursor:pointer;min-height:36px;display:flex;align-items:center}
+.add-med form{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.add-med .field{gap:3px}
+.add-med .field label{font-size:.84em}
+.add-med input[type=text],.add-med input[type=time]{min-height:42px;padding:0 12px}
+.add-med .btn{min-height:44px}
 .next{background:var(--accent);color:var(--accent-ink);border:0}
 .next .sub,.next .note{color:inherit;opacity:.9}
 .vlog{display:flex;flex-direction:column;gap:10px}

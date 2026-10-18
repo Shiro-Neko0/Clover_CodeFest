@@ -218,6 +218,8 @@ export default function CaregiverHome() {
 
   return (
     <main className="screen">
+      <div className="row sp"><div><h2 className="t">{data.elder.name}</h2><p className="sub">Updates every 30 seconds</p></div>
+        <span className={`pill ${data.alerts.length ? 'bad' : 'ok'}`}>{data.alerts.length ? 'Has alerts' : 'All fine'}</span></div>
       <div className="row sp">
         <div>
           <h2 className="t">{data.elder.name}</h2>
