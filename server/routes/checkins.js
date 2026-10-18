@@ -1,3 +1,4 @@
+import { buildContext } from '../context.js';
 import { Router } from 'express';
 import { CheckInM, MealM, AlertM } from '../models.js';
 import { requireAuth, onlyRole, resolveElder } from '../auth.js';
@@ -17,7 +18,8 @@ r.post('/message', onlyRole('elder'), async (req, res) => {
   if (!last || last.from !== 'user' || !last.text) return res.status(400).json({ error: 'Send the chat so far, ending with the user message.' });
 
   const date = todayKL();
-  const out = await checkinTurn(messages);
+  const out = await checkinTurn(messages, await buildContext(req.user));
+  if (RED_FLAGS.test(last.text)) out.reply = 'This may be an emergency. Please call 999 now. I am telling your caregiver.';
   const x = out.extracted || {};
 
   const symptoms = Array.isArray(x.symptoms) ? x.symptoms.filter(Boolean).map(String) : [];
