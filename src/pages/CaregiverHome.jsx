@@ -7,7 +7,6 @@ import Tiles from '../components/Tiles.jsx';
 const pillFor = { taken: ['ok', 'Taken'], due: ['warn', 'Due'], missed: ['bad', 'Missed'], later: ['mute', 'Later'] };
 const ago = (iso) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Kuala_Lumpur' });
 
-// TODO (team): decide what caregivers really need. This is a first guess.
 export default function CaregiverHome() {
   const { user } = useAuth();
   const [data, setData] = useState(null);
@@ -32,7 +31,6 @@ export default function CaregiverHome() {
   const taken = data.slots.filter((s) => s.status === 'taken').length;
   return (
     <main className="screen">
-      <div className="banner">Draft screen. Caregiver features are not decided yet.</div>
       <div className="row sp"><div><h2 className="t">{data.elder.name}</h2><p className="sub">Updates every 30 seconds</p></div>
         <span className={`pill ${data.alerts.length ? 'bad' : 'ok'}`}>{data.alerts.length ? 'Has alerts' : 'All fine'}</span></div>
 

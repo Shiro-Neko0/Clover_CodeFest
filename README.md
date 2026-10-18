@@ -11,7 +11,7 @@ Stack: **React (Vite)**, **Node.js + Express**, **MongoDB Atlas**, **Claude API*
 | Health: AI check-in chat (type or mic) saving sleep, meals, blood pressure, warning signs | Built |
 | Health: meal photo to calories, dashboard tiles, 7-day sleep chart | Built |
 | Medicine: today's doses, record a video to mark as taken, video log | Built (needs Cloudinary for video) |
-| Caregiver: overview, dose videos with notes, alerts | Built, first draft |
+| Caregiver: overview, dose videos with notes, alerts, remote medicine management, and control over patient medicine additions | Built |
 | Ask clover chatbot and SOS button | Built |
 | Appointments | Built as a list and form. TODO: month grid from the prototype |
 | Video feed | Layout only. TODO: add real video links in `src/data/videos.js` |
@@ -36,7 +36,7 @@ Test on your phone while developing: connect to the same Wi-Fi and open `http://
 1. Register an **elder** account and note the link code on the Me tab.
 2. In a private window, register a **caregiver** account and enter that code on the Profile tab.
 3. As the elder: add a medicine, chat on the Health tab, add a meal photo, record a dose video.
-4. As the caregiver: watch the overview update, open Dose videos, leave a note.
+4. As the caregiver: manage the person's medicines from the Medicine tab and choose whether they can add medicines themselves. Watch the overview update, and open Dose videos to leave a note.
 
 ## Deploy to Vercel
 

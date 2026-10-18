@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { MedicationM, DoseLogM } from '../models.js';
+import { MedicationM, DoseLogM, UserM } from '../models.js';
 import { requireAuth, onlyRole, resolveElder } from '../auth.js';
 import { todayKL, nowMinutesKL, toMinutes } from '../util.js';
 
@@ -38,12 +38,46 @@ r.get('/doses', resolveElder, async (req, res) => {
 // GET /api/meds
 r.get('/', resolveElder, async (req, res) => res.json({ meds: await MedicationM.find({ elder: req.elderId, active: true }) }));
 
+// GET /api/meds/patient-add-setting
+r.get('/patient-add-setting', resolveElder, async (req, res) => {
+  const elder = await UserM.findById(req.elderId);
+  if (!elder) return res.status(404).json({ error: 'Person not found.' });
+  res.json({ allowed: elder.allowPatientMedicationAdd });
+});
+
+// PUT /api/meds/patient-add-setting  { allowed, elderId }
+r.put('/patient-add-setting', onlyRole('caregiver'), resolveElder, async (req, res) => {
+  const { allowed } = req.body || {};
+  if (typeof allowed !== 'boolean') return res.status(400).json({ error: 'Choose whether the person can add medicines.' });
+  const elder = await UserM.findByIdAndUpdate(
+    req.elderId,
+    { $set: { allowPatientMedicationAdd: allowed } },
+    { new: true, runValidators: true }
+  );
+  if (!elder) return res.status(404).json({ error: 'Person not found.' });
+  res.json({ allowed: elder.allowPatientMedicationAdd });
+});
+
 // POST /api/meds  { name, dose, times: ['08:00'] }   (elder or caregiver)
 r.post('/', resolveElder, async (req, res) => {
+  if (req.user.role === 'elder' && !req.user.allowPatientMedicationAdd) {
+    return res.status(403).json({ error: 'Your caregiver manages medicine additions.' });
+  }
   const { name, dose, times } = req.body || {};
   const list = (Array.isArray(times) ? times : []).filter((t) => /^\d{2}:\d{2}$/.test(t));
   if (!name || !list.length) return res.status(400).json({ error: 'Add the medicine name and at least one time, like 08:00.' });
   res.status(201).json({ med: await MedicationM.create({ elder: req.elderId, name, dose, times: list }) });
+});
+
+// DELETE /api/meds/:id  -> deactivate without removing dose history
+r.delete('/:id', resolveElder, async (req, res) => {
+  const med = await MedicationM.findOneAndUpdate(
+    { _id: req.params.id, elder: req.elderId, active: true },
+    { $set: { active: false } },
+    { new: true }
+  );
+  if (!med) return res.status(404).json({ error: 'Medicine not found.' });
+  res.json({ ok: true });
 });
 
 // POST /api/meds/:id/take  { time, videoUrl }

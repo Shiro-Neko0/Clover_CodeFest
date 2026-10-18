@@ -9,14 +9,19 @@ const nice = (hhmm) => new Date(`2000-01-01T${hhmm}`).toLocaleTimeString('en-GB'
 export default function Meds() {
   const [slots, setSlots] = useState([]);
   const [doses, setDoses] = useState([]);
+  const [patientCanAdd, setPatientCanAdd] = useState(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [form, setForm] = useState({ name: '', dose: '', time: '08:00' });
 
   const load = useCallback(async () => {
     try {
-      const [s, d] = await Promise.all([api('/meds/today'), api('/meds/doses')]);
-      setSlots(s.slots); setDoses(d.doses);
+      const [s, d, setting] = await Promise.all([
+        api('/meds/today'),
+        api('/meds/doses'),
+        api('/meds/patient-add-setting')
+      ]);
+      setSlots(s.slots); setDoses(d.doses); setPatientCanAdd(setting.allowed);
     } catch (e) { setErr(e.message); }
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -61,7 +66,7 @@ export default function Meds() {
           <span className="note">Your caregiver can watch the video and leave a note.</span>
         </div>
       ) : (
-        <div className="card"><b>{slots.length ? "All of today's medicine is taken." : 'No medicine added yet. Add one below.'}</b></div>
+        <div className="card"><b>{slots.length ? "All of today's medicine is taken." : patientCanAdd === false ? 'No medicine added yet. Ask your caregiver to add one.' : patientCanAdd === null ? 'Loading medicine settings…' : 'No medicine added yet. Add one below.'}</b></div>
       )}
 
       {slots.length > 0 && (
@@ -77,15 +82,20 @@ export default function Meds() {
         </div>
       )}
 
-      <details className="card add-med">
-        <summary>Add a medicine</summary>
-        <form onSubmit={addMed}>
-          <div className="field"><label htmlFor="mname">Name</label><input id="mname" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
-          <div className="field"><label htmlFor="mdose">How to take it</label><input id="mdose" type="text" value={form.dose} onChange={(e) => setForm({ ...form, dose: e.target.value })} placeholder="500 mg, 1 tablet after breakfast" /></div>
-          <div className="field"><label htmlFor="mtime">Time</label><input id="mtime" type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} required /></div>
-          <button className="btn">Save medicine</button>
-        </form>
-      </details>
+      {patientCanAdd && (
+        <details className="card add-med">
+          <summary>Add a medicine</summary>
+          <form onSubmit={addMed}>
+            <div className="field"><label htmlFor="mname">Name</label><input id="mname" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
+            <div className="field"><label htmlFor="mdose">How to take it</label><input id="mdose" type="text" value={form.dose} onChange={(e) => setForm({ ...form, dose: e.target.value })} placeholder="500 mg, 1 tablet after breakfast" /></div>
+            <div className="field"><label htmlFor="mtime">Time</label><input id="mtime" type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} required /></div>
+            <button className="btn">Save medicine</button>
+          </form>
+        </details>
+      )}
+      {patientCanAdd === false && (
+        <div className="card"><b>Your caregiver manages medicine additions.</b><p className="sub">Ask them to add or update a medicine for you.</p></div>
+      )}
 
       <h3 className="s">Video log</h3>
       {doses.length === 0 && <p className="sub">Your recorded doses will show here.</p>}

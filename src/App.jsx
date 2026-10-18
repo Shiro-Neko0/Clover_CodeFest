@@ -11,9 +11,10 @@ import Meds from './pages/Meds.jsx';
 import Me from './pages/Me.jsx';
 import CaregiverHome from './pages/CaregiverHome.jsx';
 import CaregiverDoses from './pages/CaregiverDoses.jsx';
+import CaregiverMeds from './pages/CaregiverMeds.jsx';
 
 const ELDER_TABS = [['/videos', 'Videos', 'video'], ['/calendar', 'Calendar', 'cal'], ['/health', 'Health', 'pulse'], ['/medicine', 'Medicine', 'pill'], ['/me', 'Me', 'user']];
-const CARE_TABS = [['/home', 'Overview', 'pulse'], ['/doses', 'Dose videos', 'video'], ['/me', 'Profile', 'user']];
+const CARE_TABS = [['/home', 'Overview', 'pulse'], ['/doses', 'Dose videos', 'video'], ['/care-medicine', 'Medicine', 'pill'], ['/me', 'Profile', 'user']];
 
 function Shell() {
   const { user } = useAuth();
@@ -35,7 +36,7 @@ function Shell() {
         )}
       </header>
       <Outlet />
-      <nav className={`nav${elder ? '' : ' n3'}`} aria-label="Main">
+      <nav className={`nav${elder ? '' : ' n4'}`} aria-label="Main">
         {tabs.map(([to, label, icon]) => (
           <NavLink key={to} to={to}><Icon name={icon} size={24} />{label}</NavLink>
         ))}
@@ -67,6 +68,7 @@ export default function App() {
           <>
             <Route path="/home" element={<CaregiverHome />} />
             <Route path="/doses" element={<CaregiverDoses />} />
+            <Route path="/care-medicine" element={<CaregiverMeds />} />
             <Route path="/me" element={<Me />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </>
