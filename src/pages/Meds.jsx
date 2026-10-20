@@ -2,11 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { api, uploadMedia } from '../api.js';
 import Icon from '../components/Icon.jsx';
 import DoseLog from '../components/DoseLog.jsx';
+import { useTranslation } from '../i18n.js';
 
-const pillFor = { taken: ['ok', 'Taken'], due: ['warn', 'Due'], missed: ['bad', 'Missed'], later: ['mute', 'Later'] };
 const nice = (hhmm) => new Date(`2000-01-01T${hhmm}`).toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true });
 
 export default function Meds() {
+  const { t } = useTranslation();
   const [slots, setSlots] = useState([]);
   const [doses, setDoses] = useState([]);
   const [patientCanAdd, setPatientCanAdd] = useState(null);
@@ -28,6 +29,12 @@ export default function Meds() {
 
   const next = slots.find((s) => s.status !== 'taken');
   const taken = slots.filter((s) => s.status === 'taken').length;
+  const pillFor = {
+    taken: ['ok', t('taken')],
+    due: ['warn', t('due')],
+    missed: ['bad', t('missed')],
+    later: ['mute', t('later')]
+  };
 
   async function take(slot, file) {
     setBusy(true); setErr('');
@@ -49,29 +56,29 @@ export default function Meds() {
 
   return (
     <main className="screen">
-      <h2 className="t">Medicine</h2>
+      <h2 className="t">{t('medicine')}</h2>
       {err && <div className="err">{err}</div>}
 
       {next ? (
         <div className="card next">
-          <div className="row sp"><b>Next dose</b><span>{nice(next.time)}</span></div>
+          <div className="row sp"><b>{t('nextDose')}</b><span>{nice(next.time)}</span></div>
           <div><div style={{ font: '800 1.5em var(--font-d)' }}>{next.name}</div><div>{next.dose}</div></div>
           <label className="btn full" style={{ background: 'var(--accent-ink)', color: 'var(--accent)' }}>
-            <Icon name="cam" size={22} /> {busy ? 'Uploading…' : 'Record video and mark taken'}
+            <Icon name="cam" size={22} /> {busy ? t('uploading') : t('recordVideoMarkTaken')}
             <input className="vh" type="file" accept="video/*" capture="environment" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) take(next, f); }} />
           </label>
           <div className="row">
-            <button className="btn sm" style={{ background: 'rgba(255,255,255,.2)', color: 'inherit' }} disabled={busy} onClick={() => take(next, null)}>Mark taken without video</button>
+            <button className="btn sm" style={{ background: 'rgba(255,255,255,.2)', color: 'inherit' }} disabled={busy} onClick={() => take(next, null)}>{t('markTakenWithoutVideo')}</button>
           </div>
-          <span className="note">Your caregiver can watch the video and leave a note.</span>
+          <span className="note">{t('caregiverCanWatch')}</span>
         </div>
       ) : (
-        <div className="card"><b>{slots.length ? "All of today's medicine is taken." : patientCanAdd === false ? 'No medicine added yet. Ask your caregiver to add one.' : patientCanAdd === null ? 'Loading medicine settings…' : 'No medicine added yet. Add one below.'}</b></div>
+        <div className="card"><b>{slots.length ? t('allMedicineTaken') : patientCanAdd === false ? t('askCaregiverToAdd') : patientCanAdd === null ? t('loadingMedicineSettings') : t('addOneBelow')}</b></div>
       )}
 
       {slots.length > 0 && (
         <div className="card">
-          <div className="row sp"><h3 className="s">Today</h3><span className={`pill ${taken === slots.length ? 'ok' : 'mute'}`}>{taken} of {slots.length} taken</span></div>
+          <div className="row sp"><h3 className="s">{t('today')}</h3><span className={`pill ${taken === slots.length ? 'ok' : 'mute'}`}>{t('ofTaken', { taken, total: slots.length })}</span></div>
           {slots.map((s) => (
             <div className="dose" key={s.medId + s.time}>
               <span className="tm">{nice(s.time)}</span>
@@ -84,21 +91,21 @@ export default function Meds() {
 
       {patientCanAdd && (
         <details className="card add-med">
-          <summary>Add a medicine</summary>
+          <summary>{t('addMedicine')}</summary>
           <form onSubmit={addMed}>
-            <div className="field"><label htmlFor="mname">Name</label><input id="mname" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
-            <div className="field"><label htmlFor="mdose">How to take it</label><input id="mdose" type="text" value={form.dose} onChange={(e) => setForm({ ...form, dose: e.target.value })} placeholder="500 mg, 1 tablet after breakfast" /></div>
-            <div className="field"><label htmlFor="mtime">Time</label><input id="mtime" type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} required /></div>
-            <button className="btn">Save medicine</button>
+            <div className="field"><label htmlFor="mname">{t('nameLabel')}</label><input id="mname" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
+            <div className="field"><label htmlFor="mdose">{t('howToTakeIt')}</label><input id="mdose" type="text" value={form.dose} onChange={(e) => setForm({ ...form, dose: e.target.value })} placeholder={t('medicineDosePlaceholder')} /></div>
+            <div className="field"><label htmlFor="mtime">{t('time')}</label><input id="mtime" type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} required /></div>
+            <button className="btn">{t('saveMedicine')}</button>
           </form>
         </details>
       )}
       {patientCanAdd === false && (
-        <div className="card"><b>Your caregiver manages medicine additions.</b><p className="sub">Ask them to add or update a medicine for you.</p></div>
+        <div className="card"><b>{t('caregiverManagesAdditions')}</b><p className="sub">{t('askCaregiverUpdateMedicine')}</p></div>
       )}
 
-      <h3 className="s">Video log</h3>
-      {doses.length === 0 && <p className="sub">Your recorded doses will show here.</p>}
+      <h3 className="s">{t('videoLog')}</h3>
+      {doses.length === 0 && <p className="sub">{t('recordedDosesHere')}</p>}
       {doses.map((d) => <DoseLog key={d._id} dose={d} />)}
     </main>
   );

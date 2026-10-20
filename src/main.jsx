@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './auth.jsx';
 import App from './App.jsx';
+import './i18n.js';
 import AnimatedBackground from './components/AnimatedBackground.jsx';
 import './styles.css';
 

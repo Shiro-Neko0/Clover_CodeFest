@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Routes, Route, Navigate, NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from './auth.jsx';
+import { useTranslation } from './i18n.js';
 import Icon from './components/Icon.jsx';
 import { SosSheet, AskSheet } from './components/Sheets.jsx';
 import Login from './pages/Login.jsx';
@@ -13,11 +14,12 @@ import CaregiverHome from './pages/CaregiverHome.jsx';
 import CaregiverDoses from './pages/CaregiverDoses.jsx';
 import CaregiverMeds from './pages/CaregiverMeds.jsx';
 
-const ELDER_TABS = [['/videos', 'Videos', 'video'], ['/calendar', 'Calendar', 'cal'], ['/health', 'Health', 'pulse'], ['/medicine', 'Medicine', 'pill'], ['/me', 'Me', 'user']];
-const CARE_TABS = [['/home', 'Overview', 'pulse'], ['/doses', 'Dose videos', 'video'], ['/care-medicine', 'Medicine', 'pill'], ['/me', 'Profile', 'user']];
+const ELDER_TABS = [['/videos', 'videos', 'video'], ['/calendar', 'calendar', 'cal'], ['/health', 'health', 'pulse'], ['/medicine', 'medicine', 'pill'], ['/me', 'me', 'user']];
+const CARE_TABS = [['/home', 'overview', 'pulse'], ['/doses', 'doseVideos', 'video'], ['/care-medicine', 'medicine', 'pill'], ['/me', 'caregiverProfile', 'user']];
 
 function Shell() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [sheet, setSheet] = useState(null);
   const elder = user.role === 'elder';
   const tabs = elder ? ELDER_TABS : CARE_TABS;
@@ -27,18 +29,18 @@ function Shell() {
   return (
     <div className="phone" style={{ '--scale': scale }}>
       <header className="bar">
-        <div className="brand"><img src="/logo-cakna.svg" alt ="" width="50" height="80" />{!elder && <span className="rolechip">Caregiver</span>}</div>
+        <div className="brand"><img src="/logo-cakna.svg" alt ="" width="50" height="80" />{!elder && <span className="rolechip">{t('caregiverRole')}</span>}</div>
         {elder && (
           <div className="barbtns">
-            <button className="pillbtn ask" onClick={() => setSheet('ask')}><Icon name="chat" size={20} /> Ask</button>
+            <button className="pillbtn ask" onClick={() => setSheet('ask')}><Icon name="chat" size={20} /> {t('ask')}</button>
             <button className="pillbtn sos" onClick={() => setSheet('sos')}><Icon name="sos" size={20} /> SOS</button>
           </div>
         )}
       </header>
       <Outlet />
-      <nav className={`nav${elder ? '' : ' n4'}`} aria-label="Main">
-        {tabs.map(([to, label, icon]) => (
-          <NavLink key={to} to={to}><Icon name={icon} size={24} />{label}</NavLink>
+      <nav className={`nav${elder ? '' : ' n4'}`} aria-label={t('mainNavigation')}>
+        {tabs.map(([to, key, icon]) => (
+          <NavLink key={to} to={to}><Icon name={icon} size={24} />{t(key)}</NavLink>
         ))}
       </nav>
       {sheet === 'sos' && <SosSheet onClose={() => setSheet(null)} />}
@@ -49,7 +51,8 @@ function Shell() {
 
 export default function App() {
   const { user, loading } = useAuth();
-  if (loading) return <div className="center">Loading…</div>;
+  const { t } = useTranslation();
+  if (loading) return <div className="center">{t('loading')}</div>;
   if (!user) return <Login />;
   const elder = user.role === 'elder';
   return (
