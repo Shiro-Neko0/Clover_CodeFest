@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
+import { useTranslation } from '../i18n.js';
 
 export default function CaregiverMeds() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [elderId, setElderId] = useState(user.elders[0]?.id || '');
   const [meds, setMeds] = useState([]);
   const [patientCanAdd, setPatientCanAdd] = useState(null);
@@ -57,7 +59,7 @@ export default function CaregiverMeds() {
   }
 
   async function deleteMed(med) {
-    if (!window.confirm(`Remove ${med.name} from the medicine schedule?`)) return;
+    if (!window.confirm(t('medicineRemovalConfirm', { name: med.name }))) return;
     setBusy(true);
     setErr('');
     try {
@@ -69,19 +71,19 @@ export default function CaregiverMeds() {
   if (!user.elders.length) {
     return (
       <main className="screen">
-        <h2 className="t">Manage medicine</h2>
-        <div className="card"><p className="sub">Link the person you care for on your Profile before managing their medicine.</p></div>
+        <h2 className="t">{t('manageMedicine')}</h2>
+        <div className="card"><p className="sub">{t('linkCareRecipientFirst')}</p></div>
       </main>
     );
   }
 
   return (
     <main className="screen">
-      <h2 className="t">Manage medicine</h2>
-      <p className="sub">Add or remove medicines from their schedule remotely.</p>
+      <h2 className="t">{t('manageMedicine')}</h2>
+      <p className="sub">{t('manageMedicineDescription')}</p>
       {user.elders.length > 1 && (
         <div className="field">
-          <label htmlFor="medicine-elder">Person</label>
+          <label htmlFor="medicine-elder">{t('person')}</label>
           <select id="medicine-elder" value={elderId} onChange={(e) => setElderId(e.target.value)}>
             {user.elders.map((elder) => <option key={elder.id} value={elder.id}>{elder.name}</option>)}
           </select>
@@ -92,25 +94,25 @@ export default function CaregiverMeds() {
       <div className="card">
         <div className="row sp">
           <div className="grow">
-            <h3 className="s">Patient can add medicines</h3>
-            <p className="sub">Choose whether they can add medicines from their own Medicine tab.</p>
+            <h3 className="s">{t('patientCanAddMedicines')}</h3>
+            <p className="sub">{t('patientCanAddDescription')}</p>
           </div>
           <input
             className="setting-toggle"
             type="checkbox"
-            aria-label="Allow patient to add medicines"
+            aria-label={t('allowPatientToAdd')}
             checked={patientCanAdd === true}
             disabled={patientCanAdd === null || savingSetting}
             onChange={updatePatientAddSetting}
           />
         </div>
-        {patientCanAdd === null && <span className="note">Loading setting…</span>}
-        {savingSetting && <span className="note">Saving setting…</span>}
+        {patientCanAdd === null && <span className="note">{t('loadingSetting')}</span>}
+        {savingSetting && <span className="note">{t('savingSetting')}</span>}
       </div>
 
       <div className="card">
-        <h3 className="s">Current medicines</h3>
-        {!meds.length && <p className="sub">No medicines are scheduled yet.</p>}
+        <h3 className="s">{t('currentMedicines')}</h3>
+        {!meds.length && <p className="sub">{t('noMedicinesScheduled')}</p>}
         {meds.map((med) => (
           <div className="dose" key={med._id}>
             <div className="grow">
@@ -118,18 +120,18 @@ export default function CaregiverMeds() {
               {med.dose && <div className="sub">{med.dose}</div>}
               <div className="sub">{med.times.join(', ')}</div>
             </div>
-            <button className="btn bad sm" disabled={busy} onClick={() => deleteMed(med)}>Remove</button>
+            <button className="btn bad sm" disabled={busy} onClick={() => deleteMed(med)}>{t('remove')}</button>
           </div>
         ))}
       </div>
 
       <details className="card add-med" open>
-        <summary>Add a medicine</summary>
+        <summary>{t('addMedicine')}</summary>
         <form onSubmit={addMed}>
-          <div className="field"><label htmlFor="care-med-name">Name</label><input id="care-med-name" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
-          <div className="field"><label htmlFor="care-med-dose">How to take it</label><input id="care-med-dose" type="text" value={form.dose} onChange={(e) => setForm({ ...form, dose: e.target.value })} placeholder="500 mg, 1 tablet after breakfast" /></div>
-          <div className="field"><label htmlFor="care-med-time">Time</label><input id="care-med-time" type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} required /></div>
-          <button className="btn" disabled={busy}>{busy ? 'Saving…' : 'Save medicine'}</button>
+          <div className="field"><label htmlFor="care-med-name">{t('nameLabel')}</label><input id="care-med-name" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
+          <div className="field"><label htmlFor="care-med-dose">{t('howToTakeIt')}</label><input id="care-med-dose" type="text" value={form.dose} onChange={(e) => setForm({ ...form, dose: e.target.value })} placeholder={t('medicineDosePlaceholder')} /></div>
+          <div className="field"><label htmlFor="care-med-time">{t('time')}</label><input id="care-med-time" type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} required /></div>
+          <button className="btn" disabled={busy}>{busy ? t('saving') : t('saveMedicine')}</button>
         </form>
       </details>
     </main>

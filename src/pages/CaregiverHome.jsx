@@ -3,16 +3,10 @@ import { Link } from 'react-router-dom';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import Tiles from '../components/Tiles.jsx';
+import { useTranslation } from '../i18n.js';
 
-const pillFor = {
-  taken: ['ok', 'Taken'],
-  due: ['warn', 'Due'],
-  missed: ['bad', 'Missed'],
-  later: ['mute', 'Later']
-};
-
-const ago = (iso) =>
-  new Date(iso).toLocaleString('en-GB', {
+const ago = (iso, language) =>
+  new Date(iso).toLocaleString(language === 'ms' ? 'ms-MY' : 'en-GB', {
     day: 'numeric',
     month: 'short',
     hour: 'numeric',
@@ -22,6 +16,13 @@ const ago = (iso) =>
 
 export default function CaregiverHome() {
   const { user } = useAuth();
+  const { t, i18n } = useTranslation();
+  const pillFor = {
+    taken: ['ok', t('taken')],
+    due: ['warn', t('due')],
+    missed: ['bad', t('missed')],
+    later: ['mute', t('later')]
+  };
 
   const [data, setData] = useState(null);
   const [err, setErr] = useState('');
@@ -98,7 +99,7 @@ export default function CaregiverHome() {
         window.AudioContext || window.webkitAudioContext;
 
       if (!AudioContextClass) {
-        setSoundMessage('Sound alerts are not supported in this browser.');
+        setSoundMessage(t('soundUnsupported'));
         return;
       }
 
@@ -109,7 +110,7 @@ export default function CaregiverHome() {
       await audioContextRef.current.resume();
       soundEnabledRef.current = true;
       setSoundEnabled(true);
-      setSoundMessage('Alarm sound is enabled.');
+      setSoundMessage(t('alarmEnabled'));
 
       // Let the caregiver hear a test beep.
       playBeep(880);
@@ -119,10 +120,10 @@ export default function CaregiverHome() {
       }
     } catch {
       setSoundMessage(
-        'Could not enable sound. Check the browser sound settings.'
+        t('soundEnableFailed')
       );
     }
-  }, [playBeep, startAlarm]);
+  }, [playBeep, startAlarm, t]);
 
   const load = useCallback(async () => {
     if (!user.elders.length) return;
@@ -193,12 +194,12 @@ export default function CaregiverHome() {
   if (!user.elders.length) {
     return (
       <main className="screen">
-        <h2 className="t">Welcome, {user.name}</h2>
+        <h2 className="t">{t('welcomeName', { name: user.name })}</h2>
         <div className="card">
           <p style={{ margin: 0 }}>
-            Link the person you care for to see their health here.
+            {t('linkCareRecipient')}
           </p>
-          <Link className="btn" to="/me">Enter their code</Link>
+          <Link className="btn" to="/me">{t('enterTheirCodeButton')}</Link>
         </div>
       </main>
     );
@@ -207,7 +208,7 @@ export default function CaregiverHome() {
   if (!data) {
     return (
       <main className="screen">
-        {err ? <div className="err">{err}</div> : <p className="sub">Loading...</p>}
+        {err ? <div className="err">{err}</div> : <p className="sub">{t('loading')}</p>}
       </main>
     );
   }
@@ -218,26 +219,26 @@ export default function CaregiverHome() {
 
   return (
     <main className="screen">
-      <div className="row sp"><div><h2 className="t">{data.elder.name}</h2><p className="sub">Updates every 30 seconds</p></div>
-        <span className={`pill ${data.alerts.length ? 'bad' : 'ok'}`}>{data.alerts.length ? 'Has alerts' : 'All fine'}</span></div>
+      <div className="row sp"><div><h2 className="t">{data.elder.name}</h2><p className="sub">{t('updatesEvery30Seconds')}</p></div>
+        <span className={`pill ${data.alerts.length ? 'bad' : 'ok'}`}>{data.alerts.length ? t('hasAlerts') : t('allFine')}</span></div>
       <div className="row sp">
         <div>
           <h2 className="t">{data.elder.name}</h2>
-          <p className="sub">Checks for new alerts every 5 seconds</p>
+          <p className="sub">{t('checksAlertsEvery5Seconds')}</p>
         </div>
         <span className={`pill ${data.alerts.length ? 'bad' : 'ok'}`}>
-          {data.alerts.length ? 'Has alerts' : 'All fine'}
+          {data.alerts.length ? t('hasAlerts') : t('allFine')}
         </span>
       </div>
 
       {!soundEnabled && (
         <div className="card">
-          <h3 className="s">SOS notification settings</h3>
+          <h3 className="s">{t('sosNotificationSettings')}</h3>
           <p className="sub">
-            Enable sound before the demo. Keep this page open to detect new SOS alerts.
+            {t('enableSoundDemo')}
           </p>
           <button className="btn full" onClick={enableSound}>
-            Enable alarm sound
+            {t('enableAlarmSound')}
           </button>
           {soundMessage && <p className="sub">{soundMessage}</p>}
         </div>
@@ -254,16 +255,16 @@ export default function CaregiverHome() {
           }}
         >
           <h2 style={{ color: 'var(--bad)', marginTop: 0 }}>
-            SOS ALERT — PLEASE CHECK NOW
+            {t('sosAlertTitle')}
           </h2>
           <p>
-            <b>{data.elder.name}</b> may need help.
+            {t('mayNeedHelp', { name: data.elder.name })}
           </p>
-          <p className="sub">Alert received: {ago(activeSos.createdAt)}</p>
+          <p className="sub">{t('alertReceived')} {ago(activeSos.createdAt, i18n.language)}</p>
 
           {alarmPlaying && (
             <button className="btn bad full" onClick={stopAlarm}>
-              Stop alarm sound
+              {t('stopAlarmSound')}
             </button>
           )}
 
@@ -275,15 +276,15 @@ export default function CaregiverHome() {
                 startAlarm();
               }}
             >
-              Play alarm again
+              {t('playAlarmAgain')}
             </button>
           )}
         </div>
       )}
 
-      <h3 className="s">Recent alerts</h3>
+      <h3 className="s">{t('recentAlerts')}</h3>
       {data.alerts.length === 0 && (
-        <p className="sub">No alerts recorded.</p>
+        <p className="sub">{t('noAlertsRecorded')}</p>
       )}
 
       {data.alerts.map((a) => (
@@ -297,9 +298,9 @@ export default function CaregiverHome() {
         >
           <div className="row sp">
             <b style={{ color: a.kind === 'sos' ? 'var(--bad)' : undefined }}>
-              {a.kind === 'sos' ? 'SOS pressed' : a.text}
+              {a.kind === 'sos' ? t('sosPressed') : a.text}
             </b>
-            <span className="sub">{ago(a.createdAt)}</span>
+            <span className="sub">{ago(a.createdAt, i18n.language)}</span>
           </div>
         </div>
       ))}
@@ -308,14 +309,14 @@ export default function CaregiverHome() {
 
       <div className="card">
         <div className="row sp">
-          <h3 className="s">Medicine today</h3>
+          <h3 className="s">{t('medicineToday')}</h3>
           <span className={`pill ${data.slots.length && taken === data.slots.length ? 'ok' : 'mute'}`}>
-            {taken} of {data.slots.length}
+            {t('ofTaken', { taken, total: data.slots.length })}
           </span>
         </div>
 
         {data.slots.length === 0 && (
-          <p className="sub">No medicine added yet.</p>
+          <p className="sub">{t('noMedicineAdded')}</p>
         )}
 
         {data.slots.map((s) => (
@@ -331,7 +332,7 @@ export default function CaregiverHome() {
 
       {data.nextAppt && (
         <div className="card">
-          <h3 className="s">Next appointment</h3>
+          <h3 className="s">{t('nextAppointment')}</h3>
           <b>{data.nextAppt.title}</b>
           <div className="sub">
             {data.nextAppt.place} · {data.nextAppt.date} {data.nextAppt.time}
@@ -339,7 +340,7 @@ export default function CaregiverHome() {
         </div>
       )}
 
-      <Link className="btn" to="/doses">Watch dose videos</Link>
+      <Link className="btn" to="/doses">{t('watchDoseVideos')}</Link>
     </main>
   );
 }

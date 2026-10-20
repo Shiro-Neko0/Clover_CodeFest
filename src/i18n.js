@@ -1,31 +1,61 @@
-
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-
+import { useCallback, useSyncExternalStore } from 'react';
 import en from './locales/en.json';
 import ms from './locales/ms.json';
 
-const savedLanguage =
-  typeof window !== 'undefined'
-    ? localStorage.getItem('cakna-language')
-    : null;
+const resources = { en, ms };
+const listeners = new Set();
 
-i18n.use(initReactI18next).init({
-  resources: {
-    en: { translation: en },
-    ms: { translation: ms },
-  },
-  lng: savedLanguage === 'ms' ? 'ms' : 'en',
-  fallbackLng: 'en',
-  interpolation: {
-    escapeValue: false,
-  },
-});
-
-i18n.on('languageChanged', (language) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('cakna-language', language);
+function readSavedLanguage() {
+  try {
+    const saved = localStorage.getItem('cakna-language');
+    return saved === 'en' || saved === 'ms' ? saved : 'ms';
+  } catch {
+    return 'ms';
   }
-});
+}
+
+let language = readSavedLanguage();
+
+function subscribe(listener) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function getLanguage() {
+  return language;
+}
+
+function changeLanguage(nextLanguage) {
+  if (!resources[nextLanguage] || language === nextLanguage) return;
+  language = nextLanguage;
+  try {
+    localStorage.setItem('cakna-language', nextLanguage);
+  } catch {
+    // The selection still applies for this page session when storage is unavailable.
+  }
+  if (typeof document !== 'undefined') document.documentElement.lang = nextLanguage;
+  listeners.forEach((listener) => listener());
+}
+
+function translate(key, options = {}) {
+  const template = resources[language][key] ?? resources.en[key] ?? key;
+  return template.replace(/\{\{(\w+)\}\}/g, (_, name) => options[name] ?? '');
+}
+
+if (typeof document !== 'undefined') document.documentElement.lang = language;
+
+export function useTranslation() {
+  const currentLanguage = useSyncExternalStore(subscribe, getLanguage, () => 'ms');
+  const t = useCallback((key, options) => {
+    const template = resources[currentLanguage][key] ?? resources.en[key] ?? key;
+    return template.replace(/\{\{(\w+)\}\}/g, (_, name) => options?.[name] ?? '');
+  }, [currentLanguage]);
+  return {
+    t,
+    i18n: { language: currentLanguage, changeLanguage }
+  };
+}
+
+const i18n = { changeLanguage, get language() { return language; }, t: translate };
 
 export default i18n;
