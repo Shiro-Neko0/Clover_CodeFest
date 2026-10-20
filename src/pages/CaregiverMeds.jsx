@@ -9,10 +9,24 @@ export default function CaregiverMeds() {
   const [elderId, setElderId] = useState(user.elders[0]?.id || '');
   const [meds, setMeds] = useState([]);
   const [patientCanAdd, setPatientCanAdd] = useState(null);
-  const [form, setForm] = useState({ name: '', dose: '', time: '08:00' });
+
+  // Form State
+  const [form, setForm] = useState({
+    name: '',
+    howToTake: '',
+    count: '1',
+    doseStrength: '',
+    timesPerDay: 1,
+    times: ['08:00'],
+  });
+
   const [busy, setBusy] = useState(false);
   const [savingSetting, setSavingSetting] = useState(false);
   const [err, setErr] = useState('');
+  const [ocrFile, setOcrFile] = useState(null);
+  const [ocrBusy, setOcrBusy] = useState(false);
+  const [ocrProgress, setOcrProgress] = useState(0);
+  const [ocrLines, setOcrLines] = useState([]);
 
   const load = useCallback(async () => {
     if (!elderId) return;
@@ -22,40 +36,109 @@ export default function CaregiverMeds() {
       const query = `elderId=${encodeURIComponent(elderId)}`;
       const [medResult, setting] = await Promise.all([
         api(`/meds?${query}`),
-        api(`/meds/patient-add-setting?${query}`)
+        api(`/meds/patient-add-setting?${query}`),
       ]);
       setMeds(medResult.meds);
       setPatientCanAdd(setting.allowed);
-    } catch (e) { setErr(e.message); }
+    } catch (e) {
+      setErr(e.message);
+    }
   }, [elderId]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
-  async function updatePatientAddSetting(e) {
-    const allowed = e.target.checked;
-    setSavingSetting(true);
+  // Adjust time boxes when "Times per day" changes
+  function updateFrequency(newFreq) {
+    const freq = Math.max(1, parseInt(newFreq, 10) || 1);
+    const defaultSlots = ['08:00', '13:00', '19:00', '22:00'];
+    
+    let updatedTimes = [...form.times];
+    if (updatedTimes.length < freq) {
+      while (updatedTimes.length < freq) {
+        updatedTimes.push(defaultSlots[updatedTimes.length] || '12:00');
+      }
+    } else if (updatedTimes.length > freq) {
+      updatedTimes = updatedTimes.slice(0, freq);
+    }
+
+    setForm({ ...form, timesPerDay: freq, times: updatedTimes });
+  }
+
+  function handleTimeChange(index, value) {
+    const updated = [...form.times];
+    updated[index] = value;
+    setForm({ ...form, times: updated });
+  }
+
+  async function scanMedicineLabel() {
+    if (!ocrFile) {
+      setErr('Please choose a medicine photo first.');
+      return;
+    }
+
+    setOcrBusy(true);
+    setOcrProgress(0);
+    setOcrLines([]);
     setErr('');
+
     try {
-      const result = await api('/meds/patient-add-setting', {
-        method: 'PUT',
-        body: { elderId, allowed }
+      const lines = await readMedicineLabel(ocrFile, setOcrProgress);
+      const details = extractMedicineDetails(lines);
+
+      setOcrLines(lines);
+
+      setForm({
+        name: details.name || form.name,
+        howToTake: details.howToTake || form.howToTake || 'Selepas makan',
+        count: details.count || form.count,
+        doseStrength: details.doseStrength || form.doseStrength,
+        timesPerDay: details.frequency || 1,
+        times: details.times.length ? details.times : ['08:00'],
       });
-      setPatientCanAdd(result.allowed);
-    } catch (e2) { setErr(e2.message); } finally { setSavingSetting(false); }
+
+      if (!details.name && !details.doseStrength) {
+        setErr('Text detected, but details were unclear. Please fill in any missing fields.');
+      }
+    } catch (error) {
+      setErr(`Could not read photo: ${error.message}`);
+    } finally {
+      setOcrBusy(false);
+    }
   }
 
   async function addMed(e) {
     e.preventDefault();
     setBusy(true);
     setErr('');
+
+    const fullDoseString = `${form.count} biji / tablet (${form.doseStrength || 'Standard'}) — ${form.howToTake}`;
+
     try {
       await api('/meds', {
         method: 'POST',
-        body: { elderId, name: form.name, dose: form.dose, times: [form.time] }
+        body: {
+          elderId,
+          name: form.name,
+          dose: fullDoseString,
+          times: form.times,
+        },
       });
-      setForm({ name: '', dose: '', time: '08:00' });
+      setForm({
+        name: '',
+        howToTake: '',
+        count: '1',
+        doseStrength: '',
+        timesPerDay: 1,
+        times: ['08:00'],
+      });
       await load();
-    } catch (e2) { setErr(e2.message); } finally { setBusy(false); }
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function deleteMed(med) {
@@ -85,7 +168,9 @@ export default function CaregiverMeds() {
         <div className="field">
           <label htmlFor="medicine-elder">{t('person')}</label>
           <select id="medicine-elder" value={elderId} onChange={(e) => setElderId(e.target.value)}>
-            {user.elders.map((elder) => <option key={elder.id} value={elder.id}>{elder.name}</option>)}
+            {user.elders.map((elder) => (
+              <option key={elder.id} value={elder.id}>{elder.name}</option>
+            ))}
           </select>
         </div>
       )}
@@ -118,7 +203,7 @@ export default function CaregiverMeds() {
             <div className="grow">
               <b>{med.name}</b>
               {med.dose && <div className="sub">{med.dose}</div>}
-              <div className="sub">{med.times.join(', ')}</div>
+              <div className="sub">{med.times?.join(', ')}</div>
             </div>
             <button className="btn bad sm" disabled={busy} onClick={() => deleteMed(med)}>{t('remove')}</button>
           </div>

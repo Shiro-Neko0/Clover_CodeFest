@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from '../api.js';
 import Icon from '../components/Icon.jsx';
 import { useTranslation } from '../i18n.js';
@@ -13,21 +13,107 @@ export default function Appointments() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(() => ({ title: t('checkup'), place: '', date: today(), time: '10:30' }));
   const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
-    try { setItems((await api('/appointments')).appointments); } catch (e) { setErr(e.message); }
+    try {
+      const result = await api('/appointments');
+      setItems(result.appointments || []);
+      setErr('');
+    } catch (e) {
+      setErr(e.message);
+    }
   }, []);
-  useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const appointmentsByDate = useMemo(() => {
+    const grouped = {};
+    for (const appointment of items) {
+      if (!grouped[appointment.date]) grouped[appointment.date] = [];
+      grouped[appointment.date].push(appointment);
+    }
+    return grouped;
+  }, [items]);
+
+  const monthDays = useMemo(() => {
+    const year = viewMonth.getFullYear();
+    const month = viewMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const mondayOffset = (firstDay.getDay() + 6) % 7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const cells = [];
+
+    for (let i = 0; i < mondayOffset; i++) {
+      cells.push(null);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      cells.push(`${year}-${pad(month + 1)}-${pad(day)}`);
+    }
+
+    while (cells.length % 7 !== 0) cells.push(null);
+    return cells;
+  }, [viewMonth]);
+
+  const selectedAppointments = appointmentsByDate[selectedDate] || [];
+  const upcoming = items
+    .filter((a) => a.date >= today())
+    .sort((a, b) => a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''));
 
   async function add(e) {
-    e.preventDefault(); setErr('');
-    try { await api('/appointments', { method: 'POST', body: form }); setOpen(false); load(); } catch (e2) { setErr(e2.message); }
-  }
-  const toggle = async (a) => { await api(`/appointments/${a._id}`, { method: 'PATCH', body: { remind: !a.remind } }); load(); };
-  const remove = async (a) => { await api(`/appointments/${a._id}`, { method: 'DELETE' }); load(); };
+    e.preventDefault();
+    setErr('');
+    setBusy(true);
 
-  const upcoming = items.filter((a) => a.date >= today());
-  const past = items.filter((a) => a.date < today());
+    try {
+      await api('/appointments', { method: 'POST', body: form });
+      setSelectedDate(form.date);
+      const [year, month] = form.date.split('-').map(Number);
+      setViewMonth(new Date(year, month - 1, 1));
+      setOpen(false);
+      await load();
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function toggle(appointment) {
+    setErr('');
+    try {
+      await api(`/appointments/${appointment._id}`, {
+        method: 'PATCH',
+        body: { remind: !appointment.remind },
+      });
+      await load();
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
+  async function remove(appointment) {
+    if (!window.confirm(`Remove "${appointment.title}"?`)) return;
+
+    setErr('');
+    try {
+      await api(`/appointments/${appointment._id}`, { method: 'DELETE' });
+      await load();
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
+  function changeMonth(offset) {
+    setViewMonth((current) => new Date(
+      current.getFullYear(),
+      current.getMonth() + offset,
+      1,
+    ));
+  }
 
   return (
     <main className="screen">
