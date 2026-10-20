@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { useTranslation } from '../i18n.js';
+import { readMedicineLabel, extractMedicineDetails } from '../medicineOcr.js';
 
 export default function CaregiverMeds() {
   const { user } = useAuth();
@@ -21,7 +22,6 @@ export default function CaregiverMeds() {
   });
 
   const [busy, setBusy] = useState(false);
-  const [savingSetting, setSavingSetting] = useState(false);
   const [err, setErr] = useState('');
   const [ocrFile, setOcrFile] = useState(null);
   const [ocrBusy, setOcrBusy] = useState(false);
@@ -38,7 +38,7 @@ export default function CaregiverMeds() {
         api(`/meds?${query}`),
         api(`/meds/patient-add-setting?${query}`),
       ]);
-      setMeds(medResult.meds);
+      setMeds(medResult.meds || []);
       setPatientCanAdd(setting.allowed);
     } catch (e) {
       setErr(e.message);
@@ -49,7 +49,6 @@ export default function CaregiverMeds() {
     load();
   }, [load]);
 
-  // Adjust time boxes when "Times per day" changes
   function updateFrequency(newFreq) {
     const freq = Math.max(1, parseInt(newFreq, 10) || 1);
     const defaultSlots = ['08:00', '13:00', '19:00', '22:00'];
@@ -142,31 +141,27 @@ export default function CaregiverMeds() {
   }
 
   async function deleteMed(med) {
-    if (!window.confirm(t('medicineRemovalConfirm', { name: med.name }))) return;
+    if (!window.confirm(`Remove ${med.name} from schedule?`)) return;
     setBusy(true);
     setErr('');
     try {
       await api(`/meds/${med._id}?elderId=${encodeURIComponent(elderId)}`, { method: 'DELETE' });
       await load();
-    } catch (e) { setErr(e.message); } finally { setBusy(false); }
-  }
-
-  if (!user.elders.length) {
-    return (
-      <main className="screen">
-        <h2 className="t">{t('manageMedicine')}</h2>
-        <div className="card"><p className="sub">{t('linkCareRecipientFirst')}</p></div>
-      </main>
-    );
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
     <main className="screen">
-      <h2 className="t">{t('manageMedicine')}</h2>
-      <p className="sub">{t('manageMedicineDescription')}</p>
+      <h2 className="t">{t('manageMedicine') || 'Manage medicine'}</h2>
+      <p className="sub">Add or remove medicines from their schedule remotely.</p>
+
       {user.elders.length > 1 && (
         <div className="field">
-          <label htmlFor="medicine-elder">{t('person')}</label>
+          <label htmlFor="medicine-elder">{t('person') || 'Person'}</label>
           <select id="medicine-elder" value={elderId} onChange={(e) => setElderId(e.target.value)}>
             {user.elders.map((elder) => (
               <option key={elder.id} value={elder.id}>{elder.name}</option>
@@ -177,27 +172,8 @@ export default function CaregiverMeds() {
       {err && <div className="err" role="alert">{err}</div>}
 
       <div className="card">
-        <div className="row sp">
-          <div className="grow">
-            <h3 className="s">{t('patientCanAddMedicines')}</h3>
-            <p className="sub">{t('patientCanAddDescription')}</p>
-          </div>
-          <input
-            className="setting-toggle"
-            type="checkbox"
-            aria-label={t('allowPatientToAdd')}
-            checked={patientCanAdd === true}
-            disabled={patientCanAdd === null || savingSetting}
-            onChange={updatePatientAddSetting}
-          />
-        </div>
-        {patientCanAdd === null && <span className="note">{t('loadingSetting')}</span>}
-        {savingSetting && <span className="note">{t('savingSetting')}</span>}
-      </div>
-
-      <div className="card">
-        <h3 className="s">{t('currentMedicines')}</h3>
-        {!meds.length && <p className="sub">{t('noMedicinesScheduled')}</p>}
+        <h3 className="s">{t('currentMedicines') || 'Current medicines'}</h3>
+        {!meds.length && <p className="sub">{t('noMedicinesScheduled') || 'No medicines scheduled yet.'}</p>}
         {meds.map((med) => (
           <div className="dose" key={med._id}>
             <div className="grow">
@@ -205,18 +181,158 @@ export default function CaregiverMeds() {
               {med.dose && <div className="sub">{med.dose}</div>}
               <div className="sub">{med.times?.join(', ')}</div>
             </div>
-            <button className="btn bad sm" disabled={busy} onClick={() => deleteMed(med)}>{t('remove')}</button>
+            <button className="btn bad sm" disabled={busy} onClick={() => deleteMed(med)}>
+              {t('remove') || 'Remove'}
+            </button>
           </div>
         ))}
       </div>
 
       <details className="card add-med" open>
-        <summary>{t('addMedicine')}</summary>
+        <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>{t('addMedicine') || 'Add a medicine'}</summary>
         <form onSubmit={addMed}>
-          <div className="field"><label htmlFor="care-med-name">{t('nameLabel')}</label><input id="care-med-name" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
-          <div className="field"><label htmlFor="care-med-dose">{t('howToTakeIt')}</label><input id="care-med-dose" type="text" value={form.dose} onChange={(e) => setForm({ ...form, dose: e.target.value })} placeholder={t('medicineDosePlaceholder')} /></div>
-          <div className="field"><label htmlFor="care-med-time">{t('time')}</label><input id="care-med-time" type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} required /></div>
-          <button className="btn" disabled={busy}>{busy ? t('saving') : t('saveMedicine')}</button>
+          
+          {/* Photo OCR Scan */}
+          <div className="field">
+            <label htmlFor="medicine-photo">Medicine package photo</label>
+            <input
+              id="medicine-photo"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setOcrFile(e.target.files?.[0] || null)}
+            />
+            <button
+              className="btn"
+              type="button"
+              disabled={!ocrFile || ocrBusy || busy}
+              onClick={scanMedicineLabel}
+              style={{ marginTop: '0.5rem' }}
+            >
+              {ocrBusy ? `Reading label... ${ocrProgress}%` : 'Read medicine label (OCR)'}
+            </button>
+          </div>
+
+          {/* OCR Review Warning Banner */}
+          {ocrLines.length > 0 && (
+            <div 
+              style={{ 
+                backgroundColor: 'rgba(234, 179, 8, 0.15)', 
+                border: '1px solid #eab308', 
+                padding: '0.75rem', 
+                borderRadius: '8px', 
+                marginBottom: '1rem' 
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fef08a', fontWeight: 'bold' }}>
+                Note: Please review extracted details
+              </div>
+              <p style={{ fontSize: '0.85rem', color: '#fef9c3', marginTop: '0.25rem' }}>
+                OCR text extraction isn't always 100% accurate. Please review and correct the medicine name, dosage, and times below before saving.
+              </p>
+            </div>
+          )}
+
+          {/* OCR Lines Detected */}
+          {ocrLines.length > 0 && (
+            <div className="field">
+              <label>Text detected — please verify it</label>
+              <ul style={{ maxHeight: 110, overflowY: 'auto', fontSize: '0.85em', opacity: 0.85 }}>
+                {ocrLines.map((line, idx) => (
+                  <li key={`${idx}-${line}`}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Form Fields */}
+          <div className="field">
+            <label htmlFor="care-med-name">{t('nameLabel') || 'Name'}</label>
+            <input
+              id="care-med-name"
+              type="text"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="e.g. Isosorbide Dinitrate"
+              required
+            />
+          </div>
+
+          <div className="row sp" style={{ gap: '0.5rem' }}>
+            <div className="field grow">
+              <label htmlFor="care-med-how">{t('howToTakeIt') || 'How to take it'}</label>
+              <input
+                id="care-med-how"
+                type="text"
+                value={form.howToTake}
+                onChange={(e) => setForm({ ...form, howToTake: e.target.value })}
+                placeholder="e.g. Kunyah / Selepas makan"
+              />
+            </div>
+
+            <div className="field" style={{ width: '110px' }}>
+              <label htmlFor="care-med-count">Biji / Units</label>
+              <input
+                id="care-med-count"
+                type="number"
+                min="1"
+                value={form.count}
+                onChange={(e) => setForm({ ...form, count: e.target.value })}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="row sp" style={{ gap: '0.5rem' }}>
+            <div className="field grow">
+              <label htmlFor="care-med-dose">Dose / Strength</label>
+              <input
+                id="care-med-dose"
+                type="text"
+                value={form.doseStrength}
+                onChange={(e) => setForm({ ...form, doseStrength: e.target.value })}
+                placeholder="e.g. 10mg"
+              />
+            </div>
+
+            <div className="field" style={{ width: '130px' }}>
+              <label htmlFor="care-med-freq">Times per day</label>
+              <input
+                id="care-med-freq"
+                type="number"
+                min="1"
+                max="6"
+                value={form.timesPerDay}
+                onChange={(e) => updateFrequency(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Alarm Boxes */}
+          <div className="field">
+            <label>
+              Reminder Alarms ({form.timesPerDay} {form.timesPerDay > 1 ? 'times' : 'time'} / day)
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '0.5rem', marginTop: '0.25rem' }}>
+              {form.times.map((timeVal, idx) => (
+                <div key={idx} style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '0.75rem', color: '#8ea8a6', marginBottom: '2px' }}>
+                    Alarm #{idx + 1}
+                  </span>
+                  <input
+                    type="time"
+                    value={timeVal}
+                    onChange={(e) => handleTimeChange(idx, e.target.value)}
+                    required
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button className="btn" disabled={busy} style={{ marginTop: '1rem' }}>
+            {busy ? (t('saving') || 'Saving…') : (t('saveMedicine') || 'Save medicine')}
+          </button>
         </form>
       </details>
     </main>
