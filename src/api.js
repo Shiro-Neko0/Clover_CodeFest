@@ -8,18 +8,27 @@ export function setToken(t) {
 }
 export const hasToken = () => !!token;
 
-export async function api(path, { method = 'GET', body } = {}) {
-  const res = await fetch('/api' + path, {
-    method,
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    body: body ? JSON.stringify(body) : undefined
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    if (res.status === 401) setToken(null);
-    throw new Error(data.error || 'Something went wrong. Please try again.');
+export async function api(path, { method = 'GET', body } = {}, retries = 1) {
+  try {
+    const res = await fetch('/api' + path, {
+      method,
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      if (res.status === 401) setToken(null);
+      throw new Error(data.error || 'Something went wrong. Please try again.');
+    }
+    return data;
+  } catch (err) {
+    // If a proxy ECONNRESET or socket drop happens, wait 300ms and retry once automatically
+    if (retries > 0 && (err.name === 'TypeError' || err.message.includes('fetch'))) {
+      await new Promise((r) => setTimeout(r, 300));
+      return api(path, { method, body }, retries - 1);
+    }
+    throw err;
   }
-  return data;
 }
 
 // Videos go straight from the phone to Cloudinary (unsigned upload), so they never pass through Vercel's 4.5 MB limit.
