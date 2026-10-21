@@ -1,4 +1,4 @@
-# Cakna — Rakan Sihat
+# Cakna 
 
 **Cakna** is a health companion web application designed to help older adults manage their daily health routines while allowing caregivers to monitor their well-being remotely. Developed by **Team Clover**, the application focuses on medication tracking, daily health check-ins, AI-assisted guidance, and communication between older adults and their caregivers.
 
