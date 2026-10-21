@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { useTranslation } from '../i18n.js';
@@ -117,6 +117,12 @@ export default function Me() {
         </div>
       </div>
 
+      {/* Theme / Appearance Selection Card */}
+      <div className="card">
+        <ThemeToggle />
+      </div>
+
+      {/* App Language Card */}
       <div className="card">
         <h3 className="s">{t('appLanguage')}</h3>
         <select 
@@ -124,7 +130,6 @@ export default function Me() {
           value={i18n.language}
           onChange={(e) => i18n.changeLanguage(e.target.value)}
           aria-label={t('appLanguage')}
-          style={{ width: '100%', padding: '0.5rem', borderRadius: '0.25rem', border: '1px solid #083735', backgroundColor: '#2a5f5c', fontSize: '1rem' }}
         >
           <option value="ms">{t('malay')}</option>
           <option value="en">English</option>
@@ -133,5 +138,40 @@ export default function Me() {
 
       <button className="btn ghost full danger" onClick={logout}>{t('signOut')}</button>
     </main>
+  );
+}
+
+export function ThemeToggle() {
+  const { t } = useTranslation();
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || 'system';
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'system') {
+      root.removeAttribute('data-theme');
+      localStorage.removeItem('theme');
+    } else {
+      root.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    }
+  }, [theme]);
+
+  return (
+    <div className="field">
+      <h3 className="s" style={{ marginBottom: 8 }}>{t('appearance')}</h3>
+      <select
+        id="theme-select"
+        className="input-select"
+        value={theme}
+        onChange={(e) => setTheme(e.target.value)}
+        aria-label={t('appearance')}
+      >
+        <option value="system">{t('systemDefault')}</option>
+        <option value="light">{t('lightMode')}</option>
+        <option value="dark">{t('darkMode')}</option>
+      </select>
+    </div>
   );
 }

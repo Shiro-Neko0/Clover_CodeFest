@@ -218,38 +218,41 @@ export default function Appointments() {
             const isSelected = selectedDate === date;
             const isToday = today() === date;
 
-            return (
-              <button
-                key={date}
-                type="button"
-                aria-pressed={isSelected}
-                aria-label={`${date}${hasAppointments ? ', has appointments' : ''}`}
-                onClick={() => setSelectedDate(date)}
-                style={{
-                  minWidth: 0,
-                  minHeight: 52,
-                  padding: '6px 2px',
-                  borderRadius: 12,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: hasAppointments
-                    ? '#4CD5C5'
-                    : isSelected
-                    ? 'rgba(76, 213, 197, 0.2)'
-                    : 'transparent',
-                  color: hasAppointments ? '#0B2023' : '#FFFFFF',
-                  border: isSelected
-                    ? '2px solid #4CD5C5'
-                    : isToday
-                    ? '1px dashed #4CD5C5'
-                    : '1px solid rgba(255, 255, 255, 0.1)',
-                  fontWeight: hasAppointments || isToday || isSelected ? 800 : 500,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease-in-out',
-                }}
-              >
+                    return (
+          <button
+            key={date}
+            type="button"
+            aria-pressed={isSelected}
+            aria-label={`${date}${hasAppointments ? ', has appointments' : ''}`}
+            onClick={() => setSelectedDate(date)}
+            style={{
+              minWidth: 0,
+              minHeight: 52,
+              padding: '6px 2px',
+              borderRadius: 12,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              /* UPDATE THIS SECTION BELOW */
+              background: hasAppointments
+                ? '#4CD5C5'
+                : isSelected
+                ? 'rgba(76, 213, 197, 0.25)'
+                : 'var(--card-bg, transparent)',
+              color: hasAppointments 
+                ? '#0B2023' 
+                : 'var(--text-color, inherit)',
+              border: isSelected
+                ? '2px solid #4CD5C5'
+                : isToday
+                ? '1px dashed #4CD5C5'
+                : '1px solid var(--border-color, rgba(128, 128, 128, 0.2))',
+              fontWeight: hasAppointments || isToday || isSelected ? 800 : 500,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease-in-out',
+            }}
+          >
                 <span style={{ fontSize: '1rem', lineHeight: 1 }}>
                   {Number(date.slice(-2))}
                 </span>
