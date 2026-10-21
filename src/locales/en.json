@@ -219,5 +219,9 @@
   "videoTitleChair": "Five-minute chair exercises for stiff knees",
   "videoTitleBreakfast": "Breakfast ideas that keep your sugar steady",
   "videoTitleBloodPressure": "How to check your blood pressure at home",
-  "videoTitleMedicineFood": "Before food or after food? Your pills explained"
+  "videoTitleMedicineFood": "Before food or after food? Your pills explained",
+  "appearance": "Appearance",
+  "systemDefault": "System Default",
+  "lightMode": "Light Mode",
+  "darkMode": "Dark Mode"
 }
